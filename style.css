@@ -1,0 +1,75 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #111;
+}
+
+header {
+  height: 64px;
+  background: #006b3f;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 18px;
+  z-index: 1000;
+}
+
+header h1 {
+  font-size: 20px;
+  margin: 0;
+  letter-spacing: 1px;
+}
+
+button {
+  background: white;
+  color: #006b3f;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+#map {
+  width: 100vw;
+  height: calc(100vh - 64px);
+}
+
+#panelEvento {
+  position: fixed;
+  right: 24px;
+  top: 90px;
+  width: 340px;
+  background: rgba(255, 255, 255, 0.95);
+  border-left: 8px solid #006b3f;
+  padding: 16px;
+  border-radius: 10px;
+  z-index: 2000;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.35);
+}
+
+#panelEvento h2 {
+  margin: 0 0 8px 0;
+  color: #006b3f;
+  font-size: 20px;
+}
+
+#panelEvento p {
+  margin: 0 0 10px 0;
+  font-size: 15px;
+  line-height: 1.4;
+}
+
+#eventoHora {
+  font-weight: bold;
+  color: #333;
+}
+
+.oculto {
+  display: none;
+}
