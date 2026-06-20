@@ -94,13 +94,13 @@ async function ejecutarEvento(evento) {
     return;
   }
 
-  dibujarEvento(evento);
+  await dibujarEvento(evento);
 
   await esperar(2500);
   ocultarLetrero();
 }
 
-function dibujarEvento(evento) {
+async function dibujarEvento(evento) {
   const color = colores[evento.sujeto] || "#d71920";
 
   if (!puntosPorSujeto[evento.sujeto]) {
@@ -119,8 +119,7 @@ function dibujarEvento(evento) {
 
   if (puntos.length > 0) {
     const puntoAnterior = puntos[puntos.length - 1];
-
-    animarLinea(puntoAnterior, puntoActual, color, evento.modo);
+    await animarLinea(puntoAnterior, puntoActual, color, evento.modo, evento.sujeto);
   }
 
   puntos.push(puntoActual);
@@ -141,27 +140,42 @@ function esperar(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-function animarLinea(inicio, fin, color, modo) {
-  const pasos = 80;
-  let actual = 0;
+function animarLinea(inicio, fin, color, modo, sujeto) {
+  return new Promise(resolve => {
+    const pasos = 100;
+    let actual = 0;
 
-  const linea = L.polyline([inicio], {
-    color,
-    weight: 5,
-    opacity: 0.9,
-    dashArray: modo === "caminando" ? "10, 10" : null
-  }).addTo(map);
+    const linea = L.polyline([inicio], {
+      color,
+      weight: 5,
+      opacity: 0.9,
+      dashArray: modo === "caminando" ? "10, 10" : null
+    }).addTo(map);
 
-  const intervalo = setInterval(() => {
-    actual++;
+    const icono = L.divIcon({
+      className: "icono-movil",
+      html: modo === "caminando" ? "🚶" : "🚗",
+      iconSize: [30, 30],
+      iconAnchor: [15, 15]
+    });
 
-    const lat = inicio[0] + (fin[0] - inicio[0]) * (actual / pasos);
-    const lng = inicio[1] + (fin[1] - inicio[1]) * (actual / pasos);
+    let marcador = L.marker(inicio, { icon: icono }).addTo(map);
 
-    linea.addLatLng([lat, lng]);
+    const intervalo = setInterval(() => {
+      actual++;
 
-    if (actual >= pasos) {
-      clearInterval(intervalo);
-    }
-  }, 25);
+      const lat = inicio[0] + (fin[0] - inicio[0]) * (actual / pasos);
+      const lng = inicio[1] + (fin[1] - inicio[1]) * (actual / pasos);
+
+      const punto = [lat, lng];
+
+      linea.addLatLng(punto);
+      marcador.setLatLng(punto);
+
+      if (actual >= pasos) {
+        clearInterval(intervalo);
+        resolve();
+      }
+    }, 25);
+  });
 }
