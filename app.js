@@ -120,12 +120,7 @@ function dibujarEvento(evento) {
   if (puntos.length > 0) {
     const puntoAnterior = puntos[puntos.length - 1];
 
-    L.polyline([puntoAnterior, puntoActual], {
-      color,
-      weight: 5,
-      opacity: 0.9,
-      dashArray: evento.modo === "caminando" ? "10, 10" : null
-    }).addTo(map);
+    animarLinea(puntoAnterior, puntoActual, color, evento.modo);
   }
 
   puntos.push(puntoActual);
@@ -144,4 +139,29 @@ function ocultarLetrero() {
 
 function esperar(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+function animarLinea(inicio, fin, color, modo) {
+  const pasos = 80;
+  let actual = 0;
+
+  const linea = L.polyline([inicio], {
+    color,
+    weight: 5,
+    opacity: 0.9,
+    dashArray: modo === "caminando" ? "10, 10" : null
+  }).addTo(map);
+
+  const intervalo = setInterval(() => {
+    actual++;
+
+    const lat = inicio[0] + (fin[0] - inicio[0]) * (actual / pasos);
+    const lng = inicio[1] + (fin[1] - inicio[1]) * (actual / pasos);
+
+    linea.addLatLng([lat, lng]);
+
+    if (actual >= pasos) {
+      clearInterval(intervalo);
+    }
+  }, 25);
 }
