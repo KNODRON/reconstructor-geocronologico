@@ -213,3 +213,100 @@ function animarLinea(inicio, fin, color, modo, sujeto) {
     }, 25);
   });
 }
+
+let modoDibujo = false;
+let rutaTemporal = [];
+let lineaTemporal = null;
+let marcadoresTemporales = [];
+
+const iconosMovilidad = {
+  caminando: "🚶",
+  moto: "🏍️",
+  bicicleta: "🚲",
+  automovil: "🚗",
+  bus: "🚌",
+  taxi: "🚕",
+  metro: "🚇"
+};
+
+document.getElementById("btnNuevaRuta").addEventListener("click", () => {
+  modoDibujo = true;
+  rutaTemporal = [];
+  marcadoresTemporales.forEach(m => map.removeLayer(m));
+  marcadoresTemporales = [];
+
+  if (lineaTemporal) {
+    map.removeLayer(lineaTemporal);
+    lineaTemporal = null;
+  }
+
+  alert("Modo dibujo activado. Haz clic sobre el mapa para agregar puntos.");
+});
+
+document.getElementById("btnFinalizarRuta").addEventListener("click", () => {
+  if (rutaTemporal.length < 2) {
+    alert("La ruta necesita al menos 2 puntos.");
+    return;
+  }
+
+  const sujeto = document.getElementById("inputSujeto").value;
+  const movilidad = document.getElementById("inputMovilidad").value;
+  const hora = document.getElementById("inputHora").value;
+  const titulo = document.getElementById("inputTitulo").value;
+  const descripcion = document.getElementById("inputDescripcion").value;
+
+  rutaTemporal.forEach((punto, i) => {
+    eventos.push({
+      hora,
+      sujeto,
+      modo: movilidad,
+      lat: punto[0],
+      lng: punto[1],
+      titulo: i === 0 ? titulo : `Continuidad ${sujeto}`,
+      descripcion,
+      movilidad
+    });
+  });
+
+  modoDibujo = false;
+  alert("Ruta agregada a la cronología.");
+});
+
+document.getElementById("btnDeshacer").addEventListener("click", () => {
+  if (rutaTemporal.length === 0) return;
+
+  rutaTemporal.pop();
+
+  const ultimoMarcador = marcadoresTemporales.pop();
+  if (ultimoMarcador) map.removeLayer(ultimoMarcador);
+
+  if (lineaTemporal) {
+    lineaTemporal.setLatLngs(rutaTemporal);
+  }
+});
+
+map.on("click", (e) => {
+  if (!modoDibujo) return;
+
+  const punto = [e.latlng.lat, e.latlng.lng];
+  rutaTemporal.push(punto);
+
+  const marcador = L.circleMarker(punto, {
+    radius: 5,
+    color: "#ffffff",
+    fillColor: "#00ff88",
+    fillOpacity: 1
+  }).addTo(map);
+
+  marcadoresTemporales.push(marcador);
+
+  if (!lineaTemporal) {
+    lineaTemporal = L.polyline(rutaTemporal, {
+      color: "#00ff88",
+      weight: 4,
+      dashArray: document.getElementById("inputMovilidad").value === "caminando" ? "10,10" : null
+    }).addTo(map);
+  } else {
+    lineaTemporal.setLatLngs(rutaTemporal);
+  }
+});
