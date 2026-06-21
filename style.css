@@ -73,3 +73,48 @@ button {
 .oculto {
   display: none;
 }
+
+#panelDibujo {
+  position: fixed;
+  left: 16px;
+  top: 84px;
+  width: 280px;
+  background: rgba(20, 20, 20, 0.92);
+  color: white;
+  padding: 14px;
+  border-radius: 12px;
+  z-index: 2500;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.45);
+}
+
+#panelDibujo h3 {
+  margin: 0 0 12px 0;
+  color: #ffffff;
+}
+
+#panelDibujo label {
+  display: block;
+  font-size: 13px;
+  margin-top: 8px;
+  margin-bottom: 4px;
+}
+
+#panelDibujo input,
+#panelDibujo select,
+#panelDibujo textarea {
+  width: 100%;
+  padding: 7px;
+  border-radius: 6px;
+  border: none;
+  margin-bottom: 6px;
+}
+
+#panelDibujo textarea {
+  height: 60px;
+  resize: none;
+}
+
+#panelDibujo button {
+  width: 100%;
+  margin-top: 6px;
+}
