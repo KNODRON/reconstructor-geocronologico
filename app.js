@@ -9,7 +9,6 @@ L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
   attribution: "© OpenStreetMap"
 }).addTo(map);
 
-// Eventos de prueba
 const eventos = [
   {
     hora: "21:00:00",
@@ -17,8 +16,8 @@ const eventos = [
     modo: "vehiculo",
     lat: -33.4489,
     lng: -70.6693,
-    titulo: "Inicio de desplazamiento",
-    descripcion: "Vehículo inicia recorrido desde el primer punto observado."
+    titulo: "Inicio Sujeto 1",
+    descripcion: "Vehículo inicia desplazamiento."
   },
   {
     hora: "21:05:00",
@@ -26,29 +25,64 @@ const eventos = [
     modo: "vehiculo",
     lat: -33.4520,
     lng: -70.6750,
-    titulo: "Continuidad de ruta",
-    descripcion: "Vehículo continúa desplazamiento por la vía principal."
+    titulo: "Ruta Sujeto 1",
+    descripcion: "Vehículo continúa desplazamiento."
   },
   {
-    hora: "21:10:00",
+    hora: "21:07:00",
+    sujeto: "Sujeto 2",
+    modo: "vehiculo",
+    lat: -33.4372,
+    lng: -70.6506,
+    titulo: "Inicio Sujeto 2",
+    descripcion: "Se inicia una segunda ruta en otro sector."
+  },
+  {
+    hora: "21:12:00",
+    sujeto: "Sujeto 2",
+    modo: "vehiculo",
+    lat: -33.4405,
+    lng: -70.6580,
+    titulo: "Ruta Sujeto 2",
+    descripcion: "Segundo vehículo continúa desplazamiento."
+  },
+  {
+    hora: "21:15:00",
     sujeto: "Sujeto 1",
     modo: "letrero",
     lat: -33.4520,
     lng: -70.6750,
-    titulo: "Pausa explicativa",
-    descripcion: "En este punto se incorpora un antecedente relevante para la investigación."
+    titulo: "Pausa Sujeto 1",
+    descripcion: "Se incorpora antecedente relevante asociado al primer sujeto."
   },
   {
-    hora: "21:15:00",
+    hora: "21:20:00",
     sujeto: "Sujeto 1",
     modo: "caminando",
     lat: -33.4550,
     lng: -70.6800,
     titulo: "Desplazamiento a pie",
-    descripcion: "Sujeto continúa su desplazamiento caminando."
+    descripcion: "Sujeto 1 continúa desplazamiento caminando."
+  },
+  {
+    hora: "21:25:00",
+    sujeto: "Sujeto 2",
+    modo: "letrero",
+    lat: -33.4405,
+    lng: -70.6580,
+    titulo: "Pausa Sujeto 2",
+    descripcion: "Se incorpora antecedente relevante asociado al segundo sujeto."
+  },
+  {
+    hora: "21:30:00",
+    sujeto: "Sujeto 2",
+    modo: "vehiculo",
+    lat: -33.4450,
+    lng: -70.6650,
+    titulo: "Continuidad Sujeto 2",
+    descripcion: "El segundo vehículo continúa su desplazamiento."
   }
 ];
-
 const colores = {
   "Sujeto 1": "#d71920",
   "Sujeto 2": "#0057b8",
