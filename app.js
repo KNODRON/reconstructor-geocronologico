@@ -188,7 +188,7 @@ function animarLinea(inicio, fin, color, modo, sujeto) {
 
     const icono = L.divIcon({
       className: "icono-movil",
-      html: modo === "caminando" ? "🚶" : "🚗",
+      html: iconosMovilidad[modo] || "📍",
       iconSize: [30, 30],
       iconAnchor: [15, 15]
     });
