@@ -14,7 +14,42 @@
     <h1>RECONSTRUCTOR GEOCRONOLÓGICO</h1>
     <button id="btnPlay">▶ Reproducir</button>
   </header>
+  
+<section id="panelDibujo">
+  <h3>Modo dibujo</h3>
 
+  <label>Sujeto</label>
+  <select id="inputSujeto">
+    <option>Sujeto 1</option>
+    <option>Sujeto 2</option>
+    <option>Sujeto 3</option>
+  </select>
+
+  <label>Movilidad</label>
+  <select id="inputMovilidad">
+    <option value="caminando">Caminando</option>
+    <option value="moto">Moto</option>
+    <option value="bicicleta">Bicicleta</option>
+    <option value="automovil">Automóvil</option>
+    <option value="bus">Bus transporte público</option>
+    <option value="taxi">Taxi</option>
+    <option value="metro">Metro</option>
+  </select>
+
+  <label>Hora inicio</label>
+  <input id="inputHora" type="time" step="1" value="21:00:00">
+
+  <label>Título</label>
+  <input id="inputTitulo" type="text" value="Nuevo tramo">
+
+  <label>Descripción</label>
+  <textarea id="inputDescripcion">Tramo registrado en el mapa.</textarea>
+
+  <button id="btnNuevaRuta">✏ Nueva ruta</button>
+  <button id="btnFinalizarRuta">✅ Finalizar ruta</button>
+  <button id="btnDeshacer">↶ Deshacer punto</button>
+</section>
+  
   <div id="map"></div>
 
   <div id="panelEvento" class="oculto">
