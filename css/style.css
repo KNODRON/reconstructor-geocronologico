@@ -1,0 +1,357 @@
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Segoe UI,Arial,sans-serif;
+}
+
+body{
+
+    background:#1b1d21;
+    overflow:hidden;
+
+}
+
+/*==============================*/
+/* BARRA SUPERIOR */
+/*==============================*/
+
+#topbar{
+
+    height:60px;
+
+    background:#25282d;
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    padding:0 20px;
+
+    border-bottom:1px solid #333;
+
+    color:white;
+
+}
+
+.brand{
+
+    display:flex;
+
+    flex-direction:column;
+
+}
+
+.brand strong{
+
+    font-size:20px;
+
+    letter-spacing:1px;
+
+}
+
+.brand span{
+
+    font-size:12px;
+
+    color:#bdbdbd;
+
+}
+
+.top-actions{
+
+    display:flex;
+
+    gap:10px;
+
+}
+
+.top-actions button{
+
+    background:#006847;
+
+    color:white;
+
+    border:none;
+
+    border-radius:8px;
+
+    padding:8px 16px;
+
+    cursor:pointer;
+
+    transition:.2s;
+
+}
+
+.top-actions button:hover{
+
+    background:#008a5f;
+
+}
+
+/*==============================*/
+
+#workspace{
+
+    display:flex;
+
+    width:100vw;
+
+    height:calc(100vh - 60px);
+
+}
+
+/*==============================*/
+/* PANEL IZQUIERDO */
+/*==============================*/
+
+#panelIzquierdo{
+
+    width:300px;
+
+    background:#23262b;
+
+    color:white;
+
+    padding:18px;
+
+    overflow:auto;
+
+    border-right:1px solid #333;
+
+}
+
+#panelIzquierdo h3{
+
+    margin-bottom:15px;
+
+    color:#8ed8b8;
+
+}
+
+#panelIzquierdo label{
+
+    display:block;
+
+    margin-top:12px;
+
+    margin-bottom:5px;
+
+    font-size:13px;
+
+}
+
+#panelIzquierdo input,
+
+#panelIzquierdo textarea,
+
+#panelIzquierdo select{
+
+    width:100%;
+
+    border:none;
+
+    border-radius:8px;
+
+    padding:8px;
+
+    background:#3a3d42;
+
+    color:white;
+
+}
+
+#panelIzquierdo textarea{
+
+    resize:none;
+
+    height:80px;
+
+}
+
+#panelIzquierdo button{
+
+    width:100%;
+
+    margin-top:10px;
+
+    border:none;
+
+    border-radius:8px;
+
+    padding:10px;
+
+    cursor:pointer;
+
+    background:#006847;
+
+    color:white;
+
+}
+
+#panelIzquierdo button:hover{
+
+    background:#008a5f;
+
+}
+
+.checks{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:4px;
+
+}
+
+hr{
+
+    margin-top:15px;
+
+    margin-bottom:15px;
+
+    border:1px solid #34383d;
+
+}
+
+/*==============================*/
+/* MAPA */
+/*==============================*/
+
+#map{
+
+    flex:1;
+
+}
+
+/*==============================*/
+/* PANEL DERECHO */
+/*==============================*/
+
+#panelDerecho{
+
+    width:320px;
+
+    background:#23262b;
+
+    border-left:1px solid #333;
+
+    color:white;
+
+    padding:18px;
+
+    overflow:auto;
+
+}
+
+#panelDerecho h3{
+
+    margin-bottom:15px;
+
+    color:#8ed8b8;
+
+}
+
+#listaCronologia{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:10px;
+
+}
+
+/*==============================*/
+/* TARJETAS */
+/*==============================*/
+
+.cardEvento{
+
+    background:#31353a;
+
+    border-radius:10px;
+
+    padding:10px;
+
+    cursor:pointer;
+
+    transition:.2s;
+
+}
+
+.cardEvento:hover{
+
+    background:#3d4248;
+
+}
+
+/*==============================*/
+/* POPUP */
+/*==============================*/
+
+#popupEvento{
+
+    position:fixed;
+
+    right:20px;
+
+    bottom:70px;
+
+    width:360px;
+
+    background:white;
+
+    border-left:8px solid #006847;
+
+    border-radius:12px;
+
+    padding:20px;
+
+    z-index:99999;
+
+    box-shadow:0 0 20px rgba(0,0,0,.4);
+
+}
+
+.oculto{
+
+    display:none;
+
+}
+
+/*==============================*/
+/* FIRMA */
+/*==============================*/
+
+#firma{
+
+    position:fixed;
+
+    bottom:10px;
+
+    right:20px;
+
+    color:white;
+
+    opacity:.18;
+
+    font-size:12px;
+
+    letter-spacing:2px;
+
+    user-select:none;
+
+}
+
+/*==============================*/
+
+.leaflet-control-attribution{
+
+    display:none;
+
+}
