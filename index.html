@@ -55,11 +55,20 @@
       <label>Color del tramo</label>
       <input id="colorTramo" type="color" value="#d71920" />
 
+      <label>Referencia horaria</label>
+      <select id="referenciaHoraria">
+        <option value="Hora Oficial">Hora Oficial</option>
+        <option value="Hora Monitor">Hora Monitor</option>
+      </select>
+
       <label>Hora inicio</label>
       <input id="horaInicio" type="time" step="1" value="08:00:00" />
 
       <label>Hora término</label>
       <input id="horaTermino" type="time" step="1" value="08:10:00" />
+
+      <label>Duración en video (segundos)</label>
+      <input id="duracionVideo" type="number" min="1" value="12" />
 
       <label>Título</label>
       <input id="tituloTramo" type="text" value="Nuevo tramo" />
