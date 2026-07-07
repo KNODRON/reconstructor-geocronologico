@@ -40,11 +40,13 @@ function reproducirTramo(tramo) {
 
     const marcador = L.marker(tramo.puntos[0], { icon: icono }).addTo(estado.map);
 
+    const puntosAnimados = interpolarRuta(tramo.puntos, 25);
+    const intervaloMs = (tramo.duracionVideo * 1000) / puntosAnimados.length;
+
     let i = 0;
-    const intervaloMs = (tramo.duracionVideo * 1000) / tramo.puntos.length;
 
     const intervalo = setInterval(() => {
-      if (i >= tramo.puntos.length) {
+      if (i >= puntosAnimados.length) {
         clearInterval(intervalo);
 
         setTimeout(() => {
@@ -55,10 +57,31 @@ function reproducirTramo(tramo) {
         return;
       }
 
-      const punto = tramo.puntos[i];
+      const punto = puntosAnimados[i];
       linea.addLatLng(punto);
       marcador.setLatLng(punto);
       i++;
     }, intervaloMs);
   });
+}
+
+function interpolarRuta(puntos, pasosPorTramo = 25) {
+  const resultado = [];
+
+  for (let i = 0; i < puntos.length - 1; i++) {
+    const inicio = puntos[i];
+    const fin = puntos[i + 1];
+
+    for (let paso = 0; paso < pasosPorTramo; paso++) {
+      const t = paso / pasosPorTramo;
+
+      const lat = inicio[0] + (fin[0] - inicio[0]) * t;
+      const lng = inicio[1] + (fin[1] - inicio[1]) * t;
+
+      resultado.push([lat, lng]);
+    }
+  }
+
+  resultado.push(puntos[puntos.length - 1]);
+  return resultado;
 }
