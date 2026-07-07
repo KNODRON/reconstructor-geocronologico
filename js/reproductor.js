@@ -49,12 +49,11 @@ function reproducirLineaTiempo(tramos) {
           dashArray: tramo.movilidad === "caminando" ? "10,10" : null
         }).addTo(estado.map);
 
-        const icono = L.divIcon({
-          className: "iconoMovil",
-          html: ICONOS_MOVILIDAD[tramo.movilidad] || "📍",
-          iconSize: [32, 32],
-          iconAnchor: [16, 16]
-        });
+        const icono = crearIconoMovil(tramo.movilidad, 0);
+
+        tramo._marcadorAnimado = L.marker(tramo.puntos[0], {
+          icon: icono
+        }).addTo(estado.map);
 
         tramo._marcadorAnimado = L.marker(tramo.puntos[0], { icono }).addTo(estado.map);
         tramo._marcadorAnimado.setIcon(icono);
@@ -73,6 +72,12 @@ function reproducirLineaTiempo(tramos) {
 
       tramo._lineaAnimada.setLatLngs(puntosParciales);
       tramo._marcadorAnimado.setLatLng(puntoActual);
+
+      if (indice > 0) {
+        const puntoAnterior = tramo._puntosAnimados[indice - 1];
+        const angulo = calcularAngulo(puntoAnterior, puntoActual);
+      tramo._marcadorAnimado.setIcon(crearIconoMovil(tramo.movilidad, angulo));
+    }
 
       if (progreso >= 1) {
         tramo._finalizado = true;
@@ -127,4 +132,33 @@ function limpiarTramosDelMapa() {
       });
     }
   });
+}
+
+function crearIconoMovil(movilidad, angulo) {
+  const icono = ICONOS_MOVILIDAD[movilidad] || "📍";
+
+  return L.divIcon({
+    className: "iconoMovil",
+    html: `
+      <div style="
+        transform: rotate(${angulo}deg);
+        font-size: 36px;
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      ">
+        ${icono}
+      </div>
+    `,
+    iconSize: [40, 40],
+    iconAnchor: [20, 20]
+  });
+}
+
+function calcularAngulo(p1, p2) {
+  const dy = p2[0] - p1[0];
+  const dx = p2[1] - p1[1];
+  return Math.atan2(dy, dx) * 180 / Math.PI;
 }
