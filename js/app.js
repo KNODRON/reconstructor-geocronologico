@@ -4,7 +4,7 @@
 
 const proyecto = {
   nombre: "Nuevo proyecto",
-  zonaHoraria: "Chile continental",
+  referenciaHoraria: "Hora Oficial",
   tramos: []
 };
 
@@ -110,8 +110,10 @@ function crearTramoDesdeFormulario(puntos) {
     participantes,
     movilidad: document.getElementById("movilidad").value,
     color: document.getElementById("colorTramo").value,
+    referenciaHoraria: document.getElementById("referenciaHoraria").value,
     horaInicio: document.getElementById("horaInicio").value,
     horaTermino: document.getElementById("horaTermino").value,
+    duracionVideo: Number(document.getElementById("duracionVideo").value),
     titulo: document.getElementById("tituloTramo").value,
     descripcion: document.getElementById("descripcionTramo").value,
     puntos: puntos.map(p => [...p])
@@ -164,9 +166,10 @@ function actualizarCronologia() {
       const card = document.createElement("div");
       card.className = "cardEvento";
       card.innerHTML = `
-        <strong>${tramo.horaInicio} hora oficial</strong><br>
+        <strong>${tramo.horaInicio} ${tramo.referenciaHoraria}</strong><br>
         <span>${iconoMovilidad(tramo.movilidad)} ${tramo.titulo}</span><br>
         <small>${tramo.participantes.join(", ")}</small>
+        <small>Duración video: ${tramo.duracionVideo}s</small><br>
       `;
 
       card.addEventListener("click", () => {
@@ -228,7 +231,7 @@ function reproducirTramo(tramo) {
       linea.addLatLng(punto);
       marcador.setLatLng(punto);
       i++;
-    }, 180);
+    }, (tramo.duracionVideo * 1000) / tramo.puntos.length);
   });
 }
 
@@ -236,7 +239,7 @@ function mostrarPopup(tramo) {
   document.getElementById("popupTitulo").textContent = tramo.titulo;
   document.getElementById("popupDescripcion").textContent = tramo.descripcion;
   document.getElementById("popupHora").textContent =
-    `${tramo.horaInicio} hora oficial | ${tramo.participantes.join(", ")}`;
+    `${tramo.horaInicio} ${tramo.referenciaHoraria} | ${tramo.participantes.join(", ")}`
 
   document.getElementById("popupEvento").classList.remove("oculto");
 }
