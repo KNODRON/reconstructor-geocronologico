@@ -29,24 +29,45 @@ function actualizarGuion() {
   const contenedor = document.getElementById("listaCronologia");
   contenedor.innerHTML = "";
 
-  proyecto.tramos
-    .sort((a, b) => a.horaInicio.localeCompare(b.horaInicio))
-    .forEach(tramo => {
-      const card = document.createElement("div");
-      card.className = "cardEvento";
+  const items = [
+    ...proyecto.tramos.map(t => ({ ...t, _orden: t.horaInicio })),
+    ...proyecto.eventos.map(e => ({ ...e, _orden: e.hora }))
+  ].sort((a, b) => a._orden.localeCompare(b._orden));
+
+  items.forEach(item => {
+    const card = document.createElement("div");
+    card.className = "cardEvento";
+
+    if (item.tipo === "tramo") {
       card.innerHTML = `
-        <strong>${tramo.horaInicio} ${tramo.referenciaHoraria}</strong><br>
-        <span>${ICONOS_MOVILIDAD[tramo.movilidad] || "📍"} ${tramo.titulo}</span><br>
-        <small>${tramo.sujetos.join(", ")}</small><br>
-        <small>Duración visual: ${tramo.duracionVideo}s</small>
+        <strong>${item.horaInicio} ${item.referenciaHoraria}</strong><br>
+        <span>${ICONOS_MOVILIDAD[item.movilidad] || "📍"} ${item.titulo}</span><br>
+        <small>${item.sujetos.join(", ")}</small><br>
+        <small>Duración visual: ${item.duracionVideo}s</small>
       `;
 
       card.addEventListener("click", () => {
-        centrarEnPuntos(tramo.puntos, [60, 60]);
+        centrarEnPuntos(item.puntos, [60, 60]);
       });
+    }
 
-      contenedor.appendChild(card);
-    });
+    if (item.tipo === "parada") {
+      card.innerHTML = `
+        <strong>${item.hora} ${item.referenciaHoraria}</strong><br>
+        <span>📍 ${item.titulo}</span><br>
+        <small>${item.sujetos.join(", ")}</small><br>
+        <small>Duración visual: ${item.duracionVideo}s</small>
+      `;
+
+      card.addEventListener("click", () => {
+        estado.map.flyTo([item.lat, item.lng], 17, {
+          duration: 1.2
+        });
+      });
+    }
+
+    contenedor.appendChild(card);
+  });
 }
 
 function guardarProyecto() {
