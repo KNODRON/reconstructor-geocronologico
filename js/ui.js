@@ -4,6 +4,7 @@ function inicializarUI() {
   document.getElementById("btnDeshacerPunto").addEventListener("click", deshacerPunto);
   document.getElementById("btnPlay").addEventListener("click", reproducirProyecto);
   document.getElementById("btnGuardar").addEventListener("click", guardarProyecto);
+  document.getElementById("toolParada").addEventListener("click", activarModoParada);
 }
 
 function obtenerSujetosSeleccionados() {
@@ -62,5 +63,42 @@ function guardarProyecto() {
   enlace.download = "RutaMapa_proyecto.rgc";
   enlace.click();
 
+  function activarModoParada() {
+  estado.modoHerramienta = "parada";
+  estado.dibujando = false;
+  estado.map.getContainer().style.cursor = "pointer";
+  alert("Modo parada activado. Haz clic en el mapa donde ocurre el evento.");
+}
+
+function solicitarDatosParada(latlng) {
+  const titulo = prompt("Título de la parada/evento:", "Transbordo");
+  if (!titulo) return;
+
+  const descripcion = prompt(
+    "Descripción:",
+    "Sujeto desciende del medio de transporte y continúa su desplazamiento."
+  ) || "";
+
+  const hora = prompt("Hora:", document.getElementById("horaInicio").value) || "00:00:00";
+
+  const duracionVideo = Number(prompt("Duración visual en segundos:", "5")) || 5;
+
+  const parada = {
+    id: crypto.randomUUID(),
+    tipo: "parada",
+    sujetos: obtenerSujetosSeleccionados(),
+    referenciaHoraria: document.getElementById("referenciaHoraria").value,
+    hora,
+    titulo,
+    descripcion,
+    duracionVideo,
+    lat: latlng.lat,
+    lng: latlng.lng
+  };
+
+  proyecto.eventos.push(parada);
+  dibujarParada(parada);
+  actualizarGuion();
+}
   URL.revokeObjectURL(url);
 }
