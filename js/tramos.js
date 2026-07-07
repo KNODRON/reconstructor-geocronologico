@@ -7,6 +7,12 @@ function iniciarDibujo() {
 }
 
 function manejarClickMapa(e) {
+  if (estado.modoHerramienta === "parada") {
+  solicitarDatosParada(e.latlng);
+  estado.modoHerramienta = null;
+  estado.map.getContainer().style.cursor = "";
+  return;
+}
   if (!estado.dibujando) return;
 
   const punto = [e.latlng.lat, e.latlng.lng];
@@ -112,4 +118,21 @@ function dibujarTramoFinal(tramo) {
   }).addTo(estado.map);
 
   tramo.capas.push(marcadorInicio, marcadorFin);
+}
+
+function dibujarParada(parada) {
+  const marcador = L.marker([parada.lat, parada.lng], {
+    icon: L.divIcon({
+      className: "iconoParada",
+      html: "📍",
+      iconSize: [32, 32],
+      iconAnchor: [16, 32]
+    })
+  }).addTo(estado.map);
+
+  marcador.bindTooltip(parada.titulo, {
+    permanent: false
+  });
+
+  parada.capa = marcador;
 }
