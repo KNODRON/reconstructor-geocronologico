@@ -25,11 +25,13 @@ const btnIniciar = document.getElementById("btnIniciarDibujo");
 const btnFinalizar = document.getElementById("btnFinalizarDibujo");
 const btnDeshacer = document.getElementById("btnDeshacerPunto");
 const btnPlay = document.getElementById("btnPlay");
+const btnGuardar = document.getElementById("btnGuardar");
 
 btnIniciar.addEventListener("click", iniciarDibujo);
 btnFinalizar.addEventListener("click", finalizarTramo);
 btnDeshacer.addEventListener("click", deshacerPunto);
 btnPlay.addEventListener("click", reproducirProyecto);
+btnGuardar.addEventListener("click", guardarProyecto);
 
 function iniciarDibujo() {
   dibujando = true;
@@ -255,4 +257,21 @@ function iconoMovilidad(movilidad) {
   };
 
   return iconos[movilidad] || "📍";
+}
+
+function guardarProyecto() {
+  const datos = JSON.stringify(proyecto, null, 2);
+
+  const blob = new Blob([datos], {
+    type: "application/json"
+  });
+
+  const url = URL.createObjectURL(blob);
+
+  const enlace = document.createElement("a");
+  enlace.href = url;
+  enlace.download = "RutaMapa_proyecto.rgc";
+  enlace.click();
+
+  URL.revokeObjectURL(url);
 }
