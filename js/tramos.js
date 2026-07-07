@@ -136,3 +136,21 @@ function dibujarParada(parada) {
 
   parada.capa = marcador;
 }
+
+function redibujarTodo() {
+  proyecto.tramos.forEach(tramo => {
+    if (tramo.capas) {
+      tramo.capas.forEach(capa => {
+        if (estado.map.hasLayer(capa)) {
+          estado.map.removeLayer(capa);
+        }
+      });
+    }
+
+    tramo.capas = [];
+  });
+
+  proyecto.tramos.forEach(tramo => {
+    dibujarTramoFinal(tramo);
+  });
+}
