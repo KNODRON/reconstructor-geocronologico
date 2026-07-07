@@ -1,10 +1,22 @@
 async function reproducirProyecto() {
+  limpiarTramosDelMapa();
+
   const tramosOrdenados = [...proyecto.tramos]
     .sort((a, b) => a.horaInicio.localeCompare(b.horaInicio));
 
   for (const tramo of tramosOrdenados) {
     await reproducirTramo(tramo);
   }
+}
+
+function limpiarTramosDelMapa() {
+  proyecto.tramos.forEach(tramo => {
+    if (tramo.capas) {
+      tramo.capas.forEach(capa => {
+        estado.map.removeLayer(capa);
+      });
+    }
+  });
 }
 
 function reproducirTramo(tramo) {
