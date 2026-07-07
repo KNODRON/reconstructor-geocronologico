@@ -5,6 +5,8 @@ function inicializarUI() {
   document.getElementById("btnPlay").addEventListener("click", reproducirProyecto);
   document.getElementById("btnGuardar").addEventListener("click", guardarProyecto);
   document.getElementById("toolParada").addEventListener("click", activarModoParada);
+  document.getElementById("btnGuardarCambios").addEventListener("click", guardarCambiosTramo);
+  document.getElementById("btnEliminarTramo").addEventListener("click", eliminarTramoSeleccionado);
 }
 
 function obtenerSujetosSeleccionados() {
@@ -47,7 +49,7 @@ function actualizarGuion() {
       `;
 
       card.addEventListener("click", () => {
-        centrarEnPuntos(item.puntos, [60, 60]);
+        seleccionarTramo(item.id);
       });
     }
 
@@ -120,6 +122,70 @@ function solicitarDatosParada(latlng) {
   proyecto.eventos.push(parada);
   dibujarParada(parada);
   actualizarGuion();
+}
+  function seleccionarTramo(id) {
+  const tramo = proyecto.tramos.find(t => t.id === id);
+  if (!tramo) return;
+
+  estado.tramoSeleccionadoId = id;
+
+  document.getElementById("movilidad").value = tramo.movilidad;
+  document.getElementById("colorTramo").value = tramo.color;
+  document.getElementById("referenciaHoraria").value = tramo.referenciaHoraria;
+  document.getElementById("horaInicio").value = tramo.horaInicio;
+  document.getElementById("horaTermino").value = tramo.horaTermino;
+  document.getElementById("duracionVideo").value = tramo.duracionVideo;
+  document.getElementById("tituloTramo").value = tramo.titulo;
+  document.getElementById("descripcionTramo").value = tramo.descripcion;
+
+  document.querySelectorAll(".checks input").forEach(input => {
+    input.checked = tramo.sujetos.includes(input.value);
+  });
+
+  centrarEnPuntos(tramo.puntos, [60, 60]);
+}
+
+function guardarCambiosTramo() {
+  const tramo = proyecto.tramos.find(t => t.id === estado.tramoSeleccionadoId);
+
+  if (!tramo) {
+    alert("Selecciona un tramo desde la cronología.");
+    return;
+  }
+
+  tramo.sujetos = obtenerSujetosSeleccionados();
+  tramo.movilidad = document.getElementById("movilidad").value;
+  tramo.color = document.getElementById("colorTramo").value;
+  tramo.referenciaHoraria = document.getElementById("referenciaHoraria").value;
+  tramo.horaInicio = document.getElementById("horaInicio").value;
+  tramo.horaTermino = document.getElementById("horaTermino").value;
+  tramo.duracionVideo = Number(document.getElementById("duracionVideo").value);
+  tramo.titulo = document.getElementById("tituloTramo").value;
+  tramo.descripcion = document.getElementById("descripcionTramo").value;
+
+  redibujarTodo();
+  actualizarGuion();
+
+  alert("Tramo actualizado.");
+}
+
+function eliminarTramoSeleccionado() {
+  const id = estado.tramoSeleccionadoId;
+
+  if (!id) {
+    alert("Selecciona un tramo desde la cronología.");
+    return;
+  }
+
+  if (!confirm("¿Eliminar este tramo?")) return;
+
+  proyecto.tramos = proyecto.tramos.filter(t => t.id !== id);
+  estado.tramoSeleccionadoId = null;
+
+  redibujarTodo();
+  actualizarGuion();
+
+  alert("Tramo eliminado.");
 }
   URL.revokeObjectURL(url);
 }
