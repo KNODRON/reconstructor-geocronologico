@@ -1,71 +1,99 @@
 async function reproducirProyecto() {
   limpiarTramosDelMapa();
 
-  const tramosOrdenados = [...proyecto.tramos]
+  const tramos = [...proyecto.tramos]
     .sort((a, b) => a.horaInicio.localeCompare(b.horaInicio));
 
-  for (const tramo of tramosOrdenados) {
-    await reproducirTramo(tramo);
-  }
+  if (tramos.length === 0) return;
+
+  reproducirLineaTiempo(tramos);
 }
 
-function limpiarTramosDelMapa() {
-  proyecto.tramos.forEach(tramo => {
-    if (tramo.capas) {
-      tramo.capas.forEach(capa => {
-        estado.map.removeLayer(capa);
-      });
-    }
+function reproducirLineaTiempo(tramos) {
+  const inicioGlobal = Math.min(...tramos.map(t => horaASegundos(t.horaInicio)));
+
+  // Compresión temporal inicial:
+  // 1 minuto real = 1 segundo visual.
+  // Después lo haremos configurable.
+  const factorCompresion = 1 / 60;
+
+  const capasActivas = [];
+
+  tramos.forEach(tramo => {
+    tramo._inicioVisual = (horaASegundos(tramo.horaInicio) - inicioGlobal) * factorCompresion;
+    tramo._duracionVisual = Number(tramo.duracionVideo) || 10;
+    tramo._puntosAnimados = interpolarRuta(tramo.puntos, 35);
+    tramo._iniciado = false;
+    tramo._finalizado = false;
   });
-}
 
-function reproducirTramo(tramo) {
-  return new Promise(resolve => {
-    mostrarPopupTramo(tramo);
-    centrarEnPuntos(tramo.puntos, [80, 80]);
+  const duracionTotal = Math.max(
+    ...tramos.map(t => t._inicioVisual + t._duracionVisual)
+  );
 
-    const linea = L.polyline([], {
-      color: tramo.color,
-      weight: 6,
-      opacity: 1,
-      dashArray: tramo.movilidad === "caminando" ? "10,10" : null
-    }).addTo(estado.map);
+  const inicioReproduccion = performance.now();
 
-    const icono = L.divIcon({
-      className: "iconoMovil",
-      html: ICONOS_MOVILIDAD[tramo.movilidad] || "📍",
-      iconSize: [32, 32],
-      iconAnchor: [16, 16]
-    });
+  function frame(now) {
+    const tiempoVideo = (now - inicioReproduccion) / 1000;
 
-    const marcador = L.marker(tramo.puntos[0], { icon: icono }).addTo(estado.map);
+    tramos.forEach(tramo => {
+      if (tiempoVideo < tramo._inicioVisual || tramo._finalizado) return;
 
-    const puntosAnimados = interpolarRuta(tramo.puntos, 25);
-    const intervaloMs = (tramo.duracionVideo * 1000) / puntosAnimados.length;
+      if (!tramo._iniciado) {
+        tramo._iniciado = true;
 
-    let i = 0;
+        tramo._lineaAnimada = L.polyline([], {
+          color: tramo.color,
+          weight: 6,
+          opacity: 1,
+          dashArray: tramo.movilidad === "caminando" ? "10,10" : null
+        }).addTo(estado.map);
 
-    const intervalo = setInterval(() => {
-      if (i >= puntosAnimados.length) {
-        clearInterval(intervalo);
+        const icono = L.divIcon({
+          className: "iconoMovil",
+          html: ICONOS_MOVILIDAD[tramo.movilidad] || "📍",
+          iconSize: [32, 32],
+          iconAnchor: [16, 16]
+        });
 
-        setTimeout(() => {
-          ocultarPopup();
-          resolve();
-        }, 1200);
+        tramo._marcadorAnimado = L.marker(tramo.puntos[0], { icono }).addTo(estado.map);
+        tramo._marcadorAnimado.setIcon(icono);
 
-        return;
+        mostrarPopupTramo(tramo);
       }
 
-      const punto = puntosAnimados[i];
-      linea.addLatLng(punto);
-      marcador.setLatLng(punto);
-      i++;
-    }, intervaloMs);
-  });
+      const progreso = Math.min(
+        (tiempoVideo - tramo._inicioVisual) / tramo._duracionVisual,
+        1
+      );
+
+      const indice = Math.floor(progreso * (tramo._puntosAnimados.length - 1));
+      const puntosParciales = tramo._puntosAnimados.slice(0, indice + 1);
+      const puntoActual = tramo._puntosAnimados[indice];
+
+      tramo._lineaAnimada.setLatLngs(puntosParciales);
+      tramo._marcadorAnimado.setLatLng(puntoActual);
+
+      if (progreso >= 1) {
+        tramo._finalizado = true;
+      }
+    });
+
+    if (tiempoVideo < duracionTotal + 1) {
+      requestAnimationFrame(frame);
+    } else {
+      ocultarPopup();
+    }
+  }
+
+  const bounds = [];
+  tramos.forEach(t => bounds.push(...t.puntos));
+  centrarEnPuntos(bounds, [80, 80]);
+
+  requestAnimationFrame(frame);
 }
 
-function interpolarRuta(puntos, pasosPorTramo = 25) {
+function interpolarRuta(puntos, pasosPorTramo = 35) {
   const resultado = [];
 
   for (let i = 0; i < puntos.length - 1; i++) {
@@ -84,4 +112,19 @@ function interpolarRuta(puntos, pasosPorTramo = 25) {
 
   resultado.push(puntos[puntos.length - 1]);
   return resultado;
+}
+
+function horaASegundos(hora) {
+  const [h, m, s] = hora.split(":").map(Number);
+  return h * 3600 + m * 60 + s;
+}
+
+function limpiarTramosDelMapa() {
+  proyecto.tramos.forEach(tramo => {
+    if (tramo.capas) {
+      tramo.capas.forEach(capa => {
+        estado.map.removeLayer(capa);
+      });
+    }
+  });
 }
