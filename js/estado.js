@@ -12,5 +12,6 @@ const estado = {
   modoHerramienta: null,
   puntosTemp: [],
   lineaTemp: null,
+  tramoSeleccionadoId: null,
   puntosVisuales: []
 };
