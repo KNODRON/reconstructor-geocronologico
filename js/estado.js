@@ -9,7 +9,7 @@ const proyecto = {
 const estado = {
   map: null,
   dibujando: false,
-  modoHerramienta: null
+  modoHerramienta: null,
   puntosTemp: [],
   lineaTemp: null,
   puntosVisuales: []
