@@ -83,27 +83,33 @@ function crearTramoDesdeFormulario(puntos) {
 }
 
 function dibujarTramoFinal(tramo) {
-  L.polyline(tramo.puntos, {
+  tramo.capas = [];
+
+  const linea = L.polyline(tramo.puntos, {
     color: tramo.color,
     weight: 5,
     opacity: 0.95,
     dashArray: tramo.movilidad === "caminando" ? "10,10" : null
   }).addTo(estado.map);
 
+  tramo.capas.push(linea);
+
   const inicio = tramo.puntos[0];
   const fin = tramo.puntos[tramo.puntos.length - 1];
 
-  L.circleMarker(inicio, {
+  const marcadorInicio = L.circleMarker(inicio, {
     radius: 6,
     color: tramo.color,
     fillColor: tramo.color,
     fillOpacity: 1
-  }).addTo(estado.map).bindTooltip("Inicio", { permanent: false });
+  }).addTo(estado.map);
 
-  L.circleMarker(fin, {
+  const marcadorFin = L.circleMarker(fin, {
     radius: 6,
     color: tramo.color,
     fillColor: tramo.color,
     fillOpacity: 1
-  }).addTo(estado.map).bindTooltip("Fin", { permanent: false });
+  }).addTo(estado.map);
+
+  tramo.capas.push(marcadorInicio, marcadorFin);
 }
