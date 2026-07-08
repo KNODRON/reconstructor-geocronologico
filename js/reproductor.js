@@ -64,10 +64,16 @@ function reproducirLineaTiempo(items) {
     });
 
     if (tiempoVideo < duracionTotal + 1) {
-      requestAnimationFrame(frame);
-    } else {
-      ocultarPopup();
-    }
+
+    requestAnimationFrame(frame);
+
+} else {
+
+    ocultarPopup();
+
+    redibujarTodo();
+
+}
   }
 
   requestAnimationFrame(frame);
@@ -191,5 +197,29 @@ function horaASegundos(hora) {
 }
 
 function limpiarTramosDelMapa() {
-  redibujarTodo();
+
+    proyecto.tramos.forEach(tramo => {
+
+        if (tramo.capas) {
+
+            tramo.capas.forEach(capa => {
+
+                if (estado.map.hasLayer(capa)) {
+                    estado.map.removeLayer(capa);
+                }
+
+            });
+
+        }
+
+    });
+
+    proyecto.eventos.forEach(evento => {
+
+        if (evento.capa && estado.map.hasLayer(evento.capa)) {
+            estado.map.removeLayer(evento.capa);
+        }
+
+    });
+
 }
