@@ -100,8 +100,8 @@ function reproducirFrameTramo(tramo, tiempoVideo) {
 
   tramo._lineaAnimada.setLatLngs(puntosParciales);
   tramo._marcadorAnimado.setLatLng(puntoActual);
-  seguirMovimiento(puntoActual);
-
+  actualizarCamara();
+  
   if (indice > 0) {
     const puntoAnterior = tramo._puntosAnimados[indice - 1];
     const angulo = calcularAngulo(puntoAnterior, puntoActual);
