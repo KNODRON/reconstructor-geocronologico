@@ -4,9 +4,7 @@ function inicializarUI() {
   document.getElementById("btnDeshacerPunto").addEventListener("click", deshacerPunto);
   document.getElementById("btnPlay").addEventListener("click", reproducirProyecto);
   document.getElementById("btnGuardar").addEventListener("click", guardarProyecto);
-  document.getElementById("toolParada").addEventListener("click", activarModoParada);
-  document.getElementById("btnGuardarCambios").addEventListener("click", guardarCambiosTramo);
-  document.getElementById("btnEliminarTramo").addEventListener("click", eliminarTramoSeleccionado);
+  document.getElementById("toolParada").addEventListener("click", activarModoParada);  
 }
 
 function obtenerSujetosSeleccionados() {
@@ -40,13 +38,19 @@ function actualizarGuion() {
     const card = document.createElement("div");
     card.className = "cardEvento";
 
-    if (item.tipo === "tramo") {
-      card.innerHTML = `
-        <strong>${item.horaInicio} ${item.referenciaHoraria}</strong><br>
-        <span>${ICONOS_MOVILIDAD[item.movilidad] || "📍"} ${item.titulo}</span><br>
-        <small>${item.sujetos.join(", ")}</small><br>
-        <small>Duración visual: ${item.duracionVideo}s</small>
-      `;
+   if (item.tipo === "tramo") {
+  card.innerHTML = `
+    <strong>${item.horaInicio} ${item.referenciaHoraria}</strong><br>
+    <span>${ICONOS_MOVILIDAD[item.movilidad] || "📍"} ${item.titulo}</span><br>
+    <small>${item.sujetos.join(", ")}</small><br>
+    <small>Duración visual: ${item.duracionVideo}s</small>
+
+    <div class="accionesCard">
+      <button onclick="seleccionarTramo('${item.id}')">Editar</button>
+      <button onclick="eliminarTramoPorId('${item.id}')">Eliminar</button>
+    </div>
+  `;
+}
 
       card.addEventListener("click", () => {
         seleccionarTramo(item.id);
@@ -188,4 +192,17 @@ function eliminarTramoSeleccionado() {
   alert("Tramo eliminado.");
 }
   URL.revokeObjectURL(url);
+}
+
+function eliminarTramoPorId(id) {
+  if (!confirm("¿Eliminar este tramo?")) return;
+
+  proyecto.tramos = proyecto.tramos.filter(t => t.id !== id);
+
+  if (estado.tramoSeleccionadoId === id) {
+    estado.tramoSeleccionadoId = null;
+  }
+
+  redibujarTodo();
+  actualizarGuion();
 }
