@@ -4,12 +4,14 @@ function inicializarUI() {
   document.getElementById("btnDeshacerPunto").addEventListener("click", deshacerPunto);
   document.getElementById("btnPlay").addEventListener("click", reproducirProyecto);
   document.getElementById("btnGuardar").addEventListener("click", guardarProyecto);
-  document.getElementById("toolParada").addEventListener("click", activarModoParada);
+
+  document.getElementById("toolEvento").addEventListener("click", activarModoEvento);
+
   document.getElementById("btnNuevo").addEventListener("click", nuevoProyecto);
   document.getElementById("btnAbrir").addEventListener("click", () => {
-  document.getElementById("inputAbrirProyecto").click();
-});
-document.getElementById("inputAbrirProyecto").addEventListener("change", abrirProyecto);
+    document.getElementById("inputAbrirProyecto").click();
+  });
+  document.getElementById("inputAbrirProyecto").addEventListener("change", abrirProyecto);
 }
 
 function obtenerSujetosSeleccionados() {
@@ -22,6 +24,15 @@ function mostrarPopupTramo(tramo) {
   document.getElementById("popupDescripcion").textContent = tramo.descripcion;
   document.getElementById("popupHora").textContent =
     `${tramo.horaInicio} ${tramo.referenciaHoraria} | ${tramo.sujetos.join(", ")}`;
+
+  document.getElementById("popupEvento").classList.remove("oculto");
+}
+
+function mostrarPopupEvento(evento) {
+  document.getElementById("popupTitulo").textContent = evento.titulo;
+  document.getElementById("popupDescripcion").textContent = evento.descripcion;
+  document.getElementById("popupHora").textContent =
+    `${evento.hora} ${evento.referenciaHoraria} | ${evento.sujetos.join(", ")}`;
 
   document.getElementById("popupEvento").classList.remove("oculto");
 }
@@ -87,28 +98,30 @@ function guardarProyecto() {
   URL.revokeObjectURL(url);
 }
 
-function activarModoParada() {
-  estado.modoHerramienta = "parada";
+function activarModoEvento() {
+  estado.modoHerramienta = "evento";
   estado.dibujando = false;
   estado.map.getContainer().style.cursor = "pointer";
-  alert("Modo parada activado. Haz clic en el mapa donde ocurre el evento.");
+  alert("Modo evento activado. Haz clic en el mapa donde ocurre el evento.");
 }
 
-function solicitarDatosParada(latlng) {
-  const titulo = prompt("Título de la parada/evento:", "Transbordo");
+function solicitarDatosEvento(latlng) {
+  const categoria = prompt("Tipo de evento:", "Transbordo") || "Evento";
+  const titulo = prompt("Título del evento:", categoria);
   if (!titulo) return;
 
   const descripcion = prompt(
     "Descripción:",
-    "Sujeto desciende del medio de transporte y continúa su desplazamiento."
+    "Evento relevante dentro de la cronología investigativa."
   ) || "";
 
   const hora = prompt("Hora:", document.getElementById("horaInicio").value) || "00:00:00";
   const duracionVideo = Number(prompt("Duración visual en segundos:", "5")) || 5;
 
-  const parada = {
+  const evento = {
     id: crypto.randomUUID(),
-    tipo: "parada",
+    tipo: "evento",
+    categoria,
     sujetos: obtenerSujetosSeleccionados(),
     referenciaHoraria: document.getElementById("referenciaHoraria").value,
     hora,
@@ -119,8 +132,8 @@ function solicitarDatosParada(latlng) {
     lng: latlng.lng
   };
 
-  proyecto.eventos.push(parada);
-  dibujarParada(parada);
+  proyecto.eventos.push(evento);
+  dibujarEvento(evento);
   actualizarGuion();
 }
 
@@ -148,11 +161,7 @@ function seleccionarTramo(id) {
 
 function guardarCambiosTramo() {
   const tramo = proyecto.tramos.find(t => t.id === estado.tramoSeleccionadoId);
-
-  if (!tramo) {
-    alert("Primero presiona Editar en el tramo.");
-    return;
-  }
+  if (!tramo) return alert("Primero presiona Editar en el tramo.");
 
   tramo.sujetos = obtenerSujetosSeleccionados();
   tramo.movilidad = document.getElementById("movilidad").value;
@@ -172,10 +181,7 @@ function eliminarTramoPorId(id) {
   if (!confirm("¿Eliminar este tramo?")) return;
 
   proyecto.tramos = proyecto.tramos.filter(t => t.id !== id);
-
-  if (estado.tramoSeleccionadoId === id) {
-    estado.tramoSeleccionadoId = null;
-  }
+  estado.tramoSeleccionadoId = null;
 
   redibujarTodo();
   actualizarGuion();
@@ -189,19 +195,9 @@ function nuevoProyecto() {
   proyecto.sujetos = [];
   proyecto.tramos = [];
   proyecto.eventos = [];
-
   estado.tramoSeleccionadoId = null;
 
-  estado.map.eachLayer(layer => {
-    if (
-      layer instanceof L.Polyline ||
-      layer instanceof L.CircleMarker ||
-      layer instanceof L.Marker
-    ) {
-      estado.map.removeLayer(layer);
-    }
-  });
-
+  redibujarTodo();
   actualizarGuion();
 }
 
