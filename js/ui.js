@@ -46,7 +46,7 @@ function actualizarGuion() {
         <small>Duración visual: ${item.duracionVideo}s</small>
         <div class="accionesCard">
           <button onclick="seleccionarTramo('${item.id}')">Editar</button>
-          <button onclick="guardarCambiosTramo()">Guardar</button>
+          <button onclick="seleccionarTramo('${item.id}'); guardarCambiosTramo()">Guardar</button>
           <button onclick="eliminarTramoPorId('${item.id}')">Eliminar</button>
         </div>
       `;
