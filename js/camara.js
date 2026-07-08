@@ -1,10 +1,10 @@
-let ultimoMovimientoCamara = 0;
+window.ultimoMovimientoCamara = 0;
 
 function actualizarCamara() {
   const ahora = performance.now();
 
-  if (ahora - ultimoMovimientoCamara < 1200) return;
-  ultimoMovimientoCamara = ahora;
+  if (ahora - window.ultimoMovimientoCamara < 1000) return;
+  window.ultimoMovimientoCamara = ahora;
 
   const puntosActivos = proyecto.tramos
     .filter(t => t._iniciado && !t._finalizado && t._marcadorAnimado)
@@ -20,9 +20,7 @@ function actualizarCamara() {
     return;
   }
 
-  const bounds = L.latLngBounds(puntosActivos);
-
-  estado.map.fitBounds(bounds, {
+  estado.map.fitBounds(L.latLngBounds(puntosActivos), {
     padding: [180, 180],
     animate: true,
     duration: 1
