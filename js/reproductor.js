@@ -1,86 +1,61 @@
 async function reproducirProyecto() {
   limpiarTramosDelMapa();
 
-  const tramos = [...proyecto.tramos]
-    .sort((a, b) => a.horaInicio.localeCompare(b.horaInicio));
+  const items = [
+    ...proyecto.tramos.map(t => ({ ...t, _tipoRender: "tramo", _orden: t.horaInicio })),
+    ...proyecto.eventos.map(e => ({ ...e, _tipoRender: "parada", _orden: e.hora }))
+  ].sort((a, b) => a._orden.localeCompare(b._orden));
 
-  if (tramos.length === 0) return;
+  if (items.length === 0) return;
 
-  reproducirLineaTiempo(tramos);
+  reproducirLineaTiempo(items);
 }
 
-function reproducirLineaTiempo(tramos) {
-  const inicioGlobal = Math.min(...tramos.map(t => horaASegundos(t.horaInicio)));
-
-  // Compresión temporal inicial:
-  // 1 minuto real = 1 segundo visual.
-  // Después lo haremos configurable.
+function reproducirLineaTiempo(items) {
+  const inicioGlobal = Math.min(...items.map(i => horaASegundos(i._orden)));
   const factorCompresion = 1 / 60;
 
-  const capasActivas = [];
+  items.forEach(item => {
+    item._inicioVisual = (horaASegundos(item._orden) - inicioGlobal) * factorCompresion;
+    item._iniciado = false;
+    item._finalizado = false;
 
-  tramos.forEach(tramo => {
-    tramo._inicioVisual = (horaASegundos(tramo.horaInicio) - inicioGlobal) * factorCompresion;
-    tramo._duracionVisual = Number(tramo.duracionVideo) || 10;
-    tramo._puntosAnimados = interpolarRuta(tramo.puntos, 35);
-    tramo._iniciado = false;
-    tramo._finalizado = false;
+    if (item._tipoRender === "tramo") {
+      item._duracionVisual = Number(item.duracionVideo) || 10;
+      item._puntosAnimados = interpolarRuta(item.puntos, 35);
+    }
+
+    if (item._tipoRender === "parada") {
+      item._duracionVisual = Number(item.duracionVideo) || 5;
+    }
   });
 
   const duracionTotal = Math.max(
-    ...tramos.map(t => t._inicioVisual + t._duracionVisual)
+    ...items.map(i => i._inicioVisual + i._duracionVisual)
   );
+
+  const bounds = [];
+  items.forEach(i => {
+    if (i._tipoRender === "tramo") bounds.push(...i.puntos);
+    if (i._tipoRender === "parada") bounds.push([i.lat, i.lng]);
+  });
+
+  centrarEnPuntos(bounds, [80, 80]);
 
   const inicioReproduccion = performance.now();
 
   function frame(now) {
     const tiempoVideo = (now - inicioReproduccion) / 1000;
 
-    tramos.forEach(tramo => {
-      if (tiempoVideo < tramo._inicioVisual || tramo._finalizado) return;
+    items.forEach(item => {
+      if (tiempoVideo < item._inicioVisual || item._finalizado) return;
 
-      if (!tramo._iniciado) {
-        tramo._iniciado = true;
-
-        tramo._lineaAnimada = L.polyline([], {
-          color: tramo.color,
-          weight: 6,
-          opacity: 1,
-          dashArray: tramo.movilidad === "caminando" ? "10,10" : null
-        }).addTo(estado.map);
-
-        const icono = crearIconoMovil(tramo.movilidad, 0);
-
-        tramo._marcadorAnimado = L.marker(tramo.puntos[0], {
-          icon: icono
-        }).addTo(estado.map);
-
-        tramo._marcadorAnimado = L.marker(tramo.puntos[0], { icono }).addTo(estado.map);
-        tramo._marcadorAnimado.setIcon(icono);
-
-        mostrarPopupTramo(tramo);
+      if (item._tipoRender === "tramo") {
+        reproducirFrameTramo(item, tiempoVideo);
       }
 
-      const progreso = Math.min(
-        (tiempoVideo - tramo._inicioVisual) / tramo._duracionVisual,
-        1
-      );
-
-      const indice = Math.floor(progreso * (tramo._puntosAnimados.length - 1));
-      const puntosParciales = tramo._puntosAnimados.slice(0, indice + 1);
-      const puntoActual = tramo._puntosAnimados[indice];
-
-      tramo._lineaAnimada.setLatLngs(puntosParciales);
-      tramo._marcadorAnimado.setLatLng(puntoActual);
-
-      if (indice > 0) {
-        const puntoAnterior = tramo._puntosAnimados[indice - 1];
-        const angulo = calcularAngulo(puntoAnterior, puntoActual);
-      tramo._marcadorAnimado.setIcon(crearIconoMovil(tramo.movilidad, angulo));
-    }
-
-      if (progreso >= 1) {
-        tramo._finalizado = true;
+      if (item._tipoRender === "parada") {
+        reproducirFrameParada(item, tiempoVideo);
       }
     });
 
@@ -91,11 +66,81 @@ function reproducirLineaTiempo(tramos) {
     }
   }
 
-  const bounds = [];
-  tramos.forEach(t => bounds.push(...t.puntos));
-  centrarEnPuntos(bounds, [80, 80]);
-
   requestAnimationFrame(frame);
+}
+
+function reproducirFrameTramo(tramo, tiempoVideo) {
+  if (!tramo._iniciado) {
+    tramo._iniciado = true;
+
+    tramo._lineaAnimada = L.polyline([], {
+      color: tramo.color,
+      weight: 6,
+      opacity: 1,
+      dashArray: tramo.movilidad === "caminando" ? "10,10" : null
+    }).addTo(estado.map);
+
+    const icono = crearIconoMovil(tramo.movilidad, 0);
+
+    tramo._marcadorAnimado = L.marker(tramo.puntos[0], {
+      icon: icono
+    }).addTo(estado.map);
+
+    mostrarPopupTramo(tramo);
+  }
+
+  const progreso = Math.min(
+    (tiempoVideo - tramo._inicioVisual) / tramo._duracionVisual,
+    1
+  );
+
+  const indice = Math.floor(progreso * (tramo._puntosAnimados.length - 1));
+  const puntosParciales = tramo._puntosAnimados.slice(0, indice + 1);
+  const puntoActual = tramo._puntosAnimados[indice];
+
+  tramo._lineaAnimada.setLatLngs(puntosParciales);
+  tramo._marcadorAnimado.setLatLng(puntoActual);
+
+  if (indice > 0) {
+    const puntoAnterior = tramo._puntosAnimados[indice - 1];
+    const angulo = calcularAngulo(puntoAnterior, puntoActual);
+    tramo._marcadorAnimado.setIcon(crearIconoMovil(tramo.movilidad, angulo));
+  }
+
+  if (progreso >= 1) {
+    tramo._finalizado = true;
+  }
+}
+
+function reproducirFrameParada(parada, tiempoVideo) {
+  if (!parada._iniciado) {
+    parada._iniciado = true;
+
+    estado.map.flyTo([parada.lat, parada.lng], 16, {
+      duration: 1.2
+    });
+
+    mostrarPopupParada(parada);
+  }
+
+  const progreso = Math.min(
+    (tiempoVideo - parada._inicioVisual) / parada._duracionVisual,
+    1
+  );
+
+  if (progreso >= 1) {
+    parada._finalizado = true;
+    ocultarPopup();
+  }
+}
+
+function mostrarPopupParada(parada) {
+  document.getElementById("popupTitulo").textContent = parada.titulo;
+  document.getElementById("popupDescripcion").textContent = parada.descripcion;
+  document.getElementById("popupHora").textContent =
+    `${parada.hora} ${parada.referenciaHoraria} | ${parada.sujetos.join(", ")}`;
+
+  document.getElementById("popupEvento").classList.remove("oculto");
 }
 
 function interpolarRuta(puntos, pasosPorTramo = 35) {
@@ -107,31 +152,14 @@ function interpolarRuta(puntos, pasosPorTramo = 35) {
 
     for (let paso = 0; paso < pasosPorTramo; paso++) {
       const t = paso / pasosPorTramo;
-
       const lat = inicio[0] + (fin[0] - inicio[0]) * t;
       const lng = inicio[1] + (fin[1] - inicio[1]) * t;
-
       resultado.push([lat, lng]);
     }
   }
 
   resultado.push(puntos[puntos.length - 1]);
   return resultado;
-}
-
-function horaASegundos(hora) {
-  const [h, m, s] = hora.split(":").map(Number);
-  return h * 3600 + m * 60 + s;
-}
-
-function limpiarTramosDelMapa() {
-  proyecto.tramos.forEach(tramo => {
-    if (tramo.capas) {
-      tramo.capas.forEach(capa => {
-        estado.map.removeLayer(capa);
-      });
-    }
-  });
 }
 
 function crearIconoMovil(movilidad, angulo) {
@@ -145,9 +173,9 @@ function crearIconoMovil(movilidad, angulo) {
         font-size: 36px;
         width: 40px;
         height: 40px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
+        display:flex;
+        align-items:center;
+        justify-content:center;
       ">
         ${icono}
       </div>
@@ -161,4 +189,19 @@ function calcularAngulo(p1, p2) {
   const dy = p2[0] - p1[0];
   const dx = p2[1] - p1[1];
   return Math.atan2(dy, dx) * 180 / Math.PI;
+}
+
+function horaASegundos(hora) {
+  const [h, m, s] = hora.split(":").map(Number);
+  return h * 3600 + m * 60 + s;
+}
+
+function limpiarTramosDelMapa() {
+  proyecto.tramos.forEach(tramo => {
+    if (tramo.capas) {
+      tramo.capas.forEach(capa => {
+        if (estado.map.hasLayer(capa)) estado.map.removeLayer(capa);
+      });
+    }
+  });
 }
