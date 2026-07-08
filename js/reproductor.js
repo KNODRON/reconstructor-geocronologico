@@ -14,6 +14,8 @@ async function reproducirProyecto() {
 function reproducirLineaTiempo(items) {
   const inicioGlobal = Math.min(...items.map(i => horaASegundos(i._orden)));
   const factorCompresion = 1 / 60;
+  const referenciaGlobal = items[0].referenciaHoraria || CONFIG.referenciaDefault;
+  actualizarReloj(inicioGlobal, referenciaGlobal);
 
   items.forEach(item => {
     item._inicioVisual = (horaASegundos(item._orden) - inicioGlobal) * factorCompresion;
@@ -46,6 +48,8 @@ function reproducirLineaTiempo(items) {
 
   function frame(now) {
     const tiempoVideo = (now - inicioReproduccion) / 1000;
+    const tiempoInvestigativo = inicioGlobal + (tiempoVideo / factorCompresion);
+    actualizarReloj(tiempoInvestigativo, referenciaGlobal);
 
     items.forEach(item => {
       if (tiempoVideo < item._inicioVisual || item._finalizado) return;
