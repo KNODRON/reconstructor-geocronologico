@@ -4,7 +4,7 @@ function inicializarUI() {
   document.getElementById("btnDeshacerPunto").addEventListener("click", deshacerPunto);
   document.getElementById("btnPlay").addEventListener("click", reproducirProyecto);
   document.getElementById("btnGuardar").addEventListener("click", guardarProyecto);
-  document.getElementById("toolParada").addEventListener("click", activarModoParada);  
+  document.getElementById("toolParada").addEventListener("click", activarModoParada);
 }
 
 function obtenerSujetosSeleccionados() {
