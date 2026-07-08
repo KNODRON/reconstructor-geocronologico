@@ -3,7 +3,7 @@ async function reproducirProyecto() {
 
   const items = [
     ...proyecto.tramos.map(t => ({ ...t, _tipoRender: "tramo", _orden: t.horaInicio })),
-    ...proyecto.eventos.map(e => ({ ...e, _tipoRender: "parada", _orden: e.hora }))
+    ...proyecto.eventos.map(e => ({ ...e, _tipoRender: "evento", _orden: e.hora }))
   ].sort((a, b) => a._orden.localeCompare(b._orden));
 
   if (items.length === 0) return;
@@ -25,7 +25,7 @@ function reproducirLineaTiempo(items) {
       item._puntosAnimados = interpolarRuta(item.puntos, 35);
     }
 
-    if (item._tipoRender === "parada") {
+    if (item._tipoRender === "evento") {
       item._duracionVisual = Number(item.duracionVideo) || 5;
     }
   });
