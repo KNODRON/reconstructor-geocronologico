@@ -144,19 +144,20 @@ function dibujarParada(parada) {
 }
 
 function redibujarTodo() {
-  proyecto.tramos.forEach(tramo => {
-    if (tramo.capas) {
-      tramo.capas.forEach(capa => {
-        if (estado.map.hasLayer(capa)) {
-          estado.map.removeLayer(capa);
-        }
-      });
+  estado.map.eachLayer(layer => {
+    if (layer instanceof L.Polyline || layer instanceof L.CircleMarker) {
+      estado.map.removeLayer(layer);
     }
-
-    tramo.capas = [];
   });
 
   proyecto.tramos.forEach(tramo => {
+    tramo.capas = [];
     dibujarTramoFinal(tramo);
+  });
+
+  proyecto.eventos.forEach(evento => {
+    if (evento.tipo === "parada") {
+      dibujarParada(evento);
+    }
   });
 }
