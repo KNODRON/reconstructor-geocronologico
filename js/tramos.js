@@ -1,18 +1,24 @@
 function iniciarDibujo() {
   estado.dibujando = true;
+  estado.modoHerramienta = null;
   estado.puntosTemp = [];
+
   limpiarTemporal();
 
   estado.map.getContainer().style.cursor = "crosshair";
+  console.log("Modo dibujo activado");
 }
 
 function manejarClickMapa(e) {
+  console.log("Click mapa", estado.dibujando, estado.modoHerramienta);
+
   if (estado.modoHerramienta === "parada") {
-  solicitarDatosParada(e.latlng);
-  estado.modoHerramienta = null;
-  estado.map.getContainer().style.cursor = "";
-  return;
-}
+    solicitarDatosParada(e.latlng);
+    estado.modoHerramienta = null;
+    estado.map.getContainer().style.cursor = "";
+    return;
+  }
+
   if (!estado.dibujando) return;
 
   const punto = [e.latlng.lat, e.latlng.lng];
