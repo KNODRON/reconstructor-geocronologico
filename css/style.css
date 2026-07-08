@@ -355,3 +355,23 @@ hr{
     display:none;
 
 }
+
+#relojProyecto {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  text-align: center;
+  color: white;
+}
+
+#relojEtiqueta {
+  display: block;
+  font-size: 11px;
+  color: #8ed8b8;
+  letter-spacing: 1px;
+}
+
+#relojHora {
+  font-size: 22px;
+  letter-spacing: 2px;
+}
