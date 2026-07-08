@@ -5,6 +5,11 @@ function inicializarUI() {
   document.getElementById("btnPlay").addEventListener("click", reproducirProyecto);
   document.getElementById("btnGuardar").addEventListener("click", guardarProyecto);
   document.getElementById("toolParada").addEventListener("click", activarModoParada);
+  document.getElementById("btnNuevo").addEventListener("click", nuevoProyecto);
+  document.getElementById("btnAbrir").addEventListener("click", () => {
+  document.getElementById("inputAbrirProyecto").click();
+});
+document.getElementById("inputAbrirProyecto").addEventListener("change", abrirProyecto);
 }
 
 function obtenerSujetosSeleccionados() {
@@ -174,4 +179,60 @@ function eliminarTramoPorId(id) {
 
   redibujarTodo();
   actualizarGuion();
+}
+
+function nuevoProyecto() {
+  if (!confirm("¿Crear nuevo proyecto? Se borrará lo que no hayas guardado.")) return;
+
+  proyecto.nombre = "Nuevo proyecto";
+  proyecto.referenciaHoraria = CONFIG.referenciaDefault;
+  proyecto.sujetos = [];
+  proyecto.tramos = [];
+  proyecto.eventos = [];
+
+  estado.tramoSeleccionadoId = null;
+
+  estado.map.eachLayer(layer => {
+    if (
+      layer instanceof L.Polyline ||
+      layer instanceof L.CircleMarker ||
+      layer instanceof L.Marker
+    ) {
+      estado.map.removeLayer(layer);
+    }
+  });
+
+  actualizarGuion();
+}
+
+function abrirProyecto(event) {
+  const archivo = event.target.files[0];
+  if (!archivo) return;
+
+  const lector = new FileReader();
+
+  lector.onload = function(e) {
+    try {
+      const datos = JSON.parse(e.target.result);
+
+      proyecto.nombre = datos.nombre || "Proyecto cargado";
+      proyecto.referenciaHoraria = datos.referenciaHoraria || CONFIG.referenciaDefault;
+      proyecto.sujetos = datos.sujetos || [];
+      proyecto.tramos = datos.tramos || [];
+      proyecto.eventos = datos.eventos || [];
+
+      estado.tramoSeleccionadoId = null;
+
+      redibujarTodo();
+      actualizarGuion();
+
+      alert("Proyecto cargado correctamente.");
+    } catch (error) {
+      alert("No se pudo abrir el archivo del proyecto.");
+      console.error(error);
+    }
+  };
+
+  lector.readAsText(archivo);
+  event.target.value = "";
 }
