@@ -2,18 +2,13 @@ function iniciarDibujo() {
   estado.dibujando = true;
   estado.modoHerramienta = null;
   estado.puntosTemp = [];
-
   limpiarTemporal();
-
   estado.map.getContainer().style.cursor = "crosshair";
-  console.log("Modo dibujo activado");
 }
 
 function manejarClickMapa(e) {
-  console.log("Click mapa", estado.dibujando, estado.modoHerramienta);
-
-  if (estado.modoHerramienta === "parada") {
-    solicitarDatosParada(e.latlng);
+  if (estado.modoHerramienta === "evento") {
+    solicitarDatosEvento(e.latlng);
     estado.modoHerramienta = null;
     estado.map.getContainer().style.cursor = "";
     return;
@@ -73,8 +68,6 @@ function finalizarTramo() {
   limpiarTemporal();
   dibujarTramoFinal(tramo);
   actualizarGuion();
-
-  alert("Tramo agregado al guion.");
 }
 
 function crearTramoDesdeFormulario(puntos) {
@@ -105,59 +98,48 @@ function dibujarTramoFinal(tramo) {
   }).addTo(estado.map);
 
   tramo.capas.push(linea);
-
-  const inicio = tramo.puntos[0];
-  const fin = tramo.puntos[tramo.puntos.length - 1];
-
-  const marcadorInicio = L.circleMarker(inicio, {
-    radius: 6,
-    color: tramo.color,
-    fillColor: tramo.color,
-    fillOpacity: 1
-  }).addTo(estado.map);
-
-  const marcadorFin = L.circleMarker(fin, {
-    radius: 6,
-    color: tramo.color,
-    fillColor: tramo.color,
-    fillOpacity: 1
-  }).addTo(estado.map);
-
-  tramo.capas.push(marcadorInicio, marcadorFin);
 }
 
-function dibujarParada(parada) {
-  const marcador = L.marker([parada.lat, parada.lng], {
+function dibujarEvento(evento) {
+  const marcador = L.marker([evento.lat, evento.lng], {
     icon: L.divIcon({
-      className: "iconoParada",
-      html: "📍",
-      iconSize: [32, 32],
-      iconAnchor: [16, 32]
+      className: "iconoEvento",
+      html: iconoEvento(evento.categoria),
+      iconSize: [34, 34],
+      iconAnchor: [17, 34]
     })
   }).addTo(estado.map);
 
-  marcador.bindTooltip(parada.titulo, {
-    permanent: false
-  });
+  marcador.bindTooltip(evento.titulo, { permanent: false });
+  evento.capa = marcador;
+}
 
-  parada.capa = marcador;
+function iconoEvento(categoria = "") {
+  const cat = categoria.toLowerCase();
+
+  if (cat.includes("transbordo")) return "🔁";
+  if (cat.includes("domicilio")) return "🏠";
+  if (cat.includes("ingreso")) return "🏠";
+  if (cat.includes("salida")) return "🚪";
+  if (cat.includes("sitio")) return "📍";
+  if (cat.includes("ae")) return "⚠️";
+  if (cat.includes("artefacto")) return "⚠️";
+  if (cat.includes("bus")) return "🚌";
+
+  return "📍";
 }
 
 function redibujarTodo() {
   estado.map.eachLayer(layer => {
-    if (layer instanceof L.Polyline || layer instanceof L.CircleMarker) {
+    if (
+      layer instanceof L.Polyline ||
+      layer instanceof L.CircleMarker ||
+      layer instanceof L.Marker
+    ) {
       estado.map.removeLayer(layer);
     }
   });
 
-  proyecto.tramos.forEach(tramo => {
-    tramo.capas = [];
-    dibujarTramoFinal(tramo);
-  });
-
-  proyecto.eventos.forEach(evento => {
-    if (evento.tipo === "evento") {
-      dibujarEvento(evento);
-    }
-  });
+  proyecto.tramos.forEach(tramo => dibujarTramoFinal(tramo));
+  proyecto.eventos.forEach(evento => dibujarEvento(evento));
 }
