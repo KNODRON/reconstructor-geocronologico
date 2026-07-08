@@ -100,6 +100,7 @@ function reproducirFrameTramo(tramo, tiempoVideo) {
 
   tramo._lineaAnimada.setLatLngs(puntosParciales);
   tramo._marcadorAnimado.setLatLng(puntoActual);
+  seguirMovimiento(puntoActual);
 
   if (indice > 0) {
     const puntoAnterior = tramo._puntosAnimados[indice - 1];
@@ -203,5 +204,21 @@ function limpiarTramosDelMapa() {
         if (estado.map.hasLayer(capa)) estado.map.removeLayer(capa);
       });
     }
+  });
+}
+
+let ultimoSeguimiento = 0;
+
+function seguirMovimiento(punto) {
+  const ahora = performance.now();
+
+  // Evita mover el mapa demasiadas veces por segundo
+  if (ahora - ultimoSeguimiento < 700) return;
+
+  ultimoSeguimiento = ahora;
+
+  estado.map.panTo(punto, {
+    animate: true,
+    duration: 0.6
   });
 }
