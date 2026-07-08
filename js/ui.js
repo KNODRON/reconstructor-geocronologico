@@ -38,23 +38,18 @@ function actualizarGuion() {
     const card = document.createElement("div");
     card.className = "cardEvento";
 
-   if (item.tipo === "tramo") {
-  card.innerHTML = `
-    <strong>${item.horaInicio} ${item.referenciaHoraria}</strong><br>
-    <span>${ICONOS_MOVILIDAD[item.movilidad] || "📍"} ${item.titulo}</span><br>
-    <small>${item.sujetos.join(", ")}</small><br>
-    <small>Duración visual: ${item.duracionVideo}s</small>
-
-    <div class="accionesCard">
-      <button onclick="seleccionarTramo('${item.id}')">Editar</button>
-      <button onclick="eliminarTramoPorId('${item.id}')">Eliminar</button>
-    </div>
-  `;
-}
-
-      card.addEventListener("click", () => {
-        seleccionarTramo(item.id);
-      });
+    if (item.tipo === "tramo") {
+      card.innerHTML = `
+        <strong>${item.horaInicio} ${item.referenciaHoraria}</strong><br>
+        <span>${ICONOS_MOVILIDAD[item.movilidad] || "📍"} ${item.titulo}</span><br>
+        <small>${item.sujetos.join(", ")}</small><br>
+        <small>Duración visual: ${item.duracionVideo}s</small>
+        <div class="accionesCard">
+          <button onclick="seleccionarTramo('${item.id}')">Editar</button>
+          <button onclick="guardarCambiosTramo()">Guardar</button>
+          <button onclick="eliminarTramoPorId('${item.id}')">Eliminar</button>
+        </div>
+      `;
     }
 
     if (item.tipo === "parada") {
@@ -66,9 +61,7 @@ function actualizarGuion() {
       `;
 
       card.addEventListener("click", () => {
-        estado.map.flyTo([item.lat, item.lng], 17, {
-          duration: 1.2
-        });
+        estado.map.flyTo([item.lat, item.lng], 17, { duration: 1.2 });
       });
     }
 
@@ -78,11 +71,7 @@ function actualizarGuion() {
 
 function guardarProyecto() {
   const datos = JSON.stringify(proyecto, null, 2);
-
-  const blob = new Blob([datos], {
-    type: "application/json"
-  });
-
+  const blob = new Blob([datos], { type: "application/json" });
   const url = URL.createObjectURL(blob);
 
   const enlace = document.createElement("a");
@@ -90,7 +79,10 @@ function guardarProyecto() {
   enlace.download = "RutaMapa_proyecto.rgc";
   enlace.click();
 
-  function activarModoParada() {
+  URL.revokeObjectURL(url);
+}
+
+function activarModoParada() {
   estado.modoHerramienta = "parada";
   estado.dibujando = false;
   estado.map.getContainer().style.cursor = "pointer";
@@ -107,7 +99,6 @@ function solicitarDatosParada(latlng) {
   ) || "";
 
   const hora = prompt("Hora:", document.getElementById("horaInicio").value) || "00:00:00";
-
   const duracionVideo = Number(prompt("Duración visual en segundos:", "5")) || 5;
 
   const parada = {
@@ -127,7 +118,8 @@ function solicitarDatosParada(latlng) {
   dibujarParada(parada);
   actualizarGuion();
 }
-  function seleccionarTramo(id) {
+
+function seleccionarTramo(id) {
   const tramo = proyecto.tramos.find(t => t.id === id);
   if (!tramo) return;
 
@@ -153,7 +145,7 @@ function guardarCambiosTramo() {
   const tramo = proyecto.tramos.find(t => t.id === estado.tramoSeleccionadoId);
 
   if (!tramo) {
-    alert("Selecciona un tramo desde la cronología.");
+    alert("Primero presiona Editar en el tramo.");
     return;
   }
 
@@ -169,29 +161,6 @@ function guardarCambiosTramo() {
 
   redibujarTodo();
   actualizarGuion();
-
-  alert("Tramo actualizado.");
-}
-
-function eliminarTramoSeleccionado() {
-  const id = estado.tramoSeleccionadoId;
-
-  if (!id) {
-    alert("Selecciona un tramo desde la cronología.");
-    return;
-  }
-
-  if (!confirm("¿Eliminar este tramo?")) return;
-
-  proyecto.tramos = proyecto.tramos.filter(t => t.id !== id);
-  estado.tramoSeleccionadoId = null;
-
-  redibujarTodo();
-  actualizarGuion();
-
-  alert("Tramo eliminado.");
-}
-  URL.revokeObjectURL(url);
 }
 
 function eliminarTramoPorId(id) {
