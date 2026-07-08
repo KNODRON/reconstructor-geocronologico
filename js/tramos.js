@@ -156,8 +156,8 @@ function redibujarTodo() {
   });
 
   proyecto.eventos.forEach(evento => {
-    if (evento.tipo === "parada") {
-      dibujarParada(evento);
+    if (evento.tipo === "evento") {
+      dibujarEvento(evento);
     }
   });
 }
