@@ -64,16 +64,11 @@ function reproducirLineaTiempo(items) {
     });
 
     if (tiempoVideo < duracionTotal + 1) {
-
-    requestAnimationFrame(frame);
-
-} else {
-
-    ocultarPopup();
-
-    redibujarTodo();
-
-}
+      requestAnimationFrame(frame);
+    } else {
+      ocultarPopup();
+      redibujarTodo();
+    }
   }
 
   requestAnimationFrame(frame);
