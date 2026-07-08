@@ -114,6 +114,26 @@ button {
   resize: none;
 }
 
+.accionesCard {
+  display: flex;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.accionesCard button {
+  flex: 1;
+  border: none;
+  border-radius: 6px;
+  padding: 6px;
+  background: #006847;
+  color: white;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.accionesCard button:hover {
+  background: #008a5f;
+}
 #panelDibujo button {
   width: 100%;
   margin-top: 6px;
