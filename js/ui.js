@@ -232,3 +232,18 @@ function abrirProyecto(event) {
   lector.readAsText(archivo);
   event.target.value = "";
 }
+
+function actualizarReloj(segundos, referencia = "Hora Oficial") {
+  document.getElementById("relojEtiqueta").textContent = referencia;
+  document.getElementById("relojHora").textContent = segundosAHora(segundos);
+}
+
+function segundosAHora(total) {
+  total = Math.floor(total);
+
+  const h = String(Math.floor(total / 3600)).padStart(2, "0");
+  const m = String(Math.floor((total % 3600) / 60)).padStart(2, "0");
+  const s = String(total % 60).padStart(2, "0");
+
+  return `${h}:${m}:${s}`;
+}
