@@ -57,10 +57,10 @@ function actualizarGuion() {
       `;
     }
 
-    if (item.tipo === "parada") {
+    if (item.tipo === "evento") {
       card.innerHTML = `
         <strong>${item.hora} ${item.referenciaHoraria}</strong><br>
-        <span>📍 ${item.titulo}</span><br>
+        <span>${iconoEvento(item.categoria)} ${item.titulo}</span><br>
         <small>${item.sujetos.join(", ")}</small><br>
         <small>Duración visual: ${item.duracionVideo}s</small>
       `;
