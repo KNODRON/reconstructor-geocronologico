@@ -180,9 +180,14 @@ function activarEdicionRuta(tramo) {
       draggable: true,
       icon: L.divIcon({
         className: "nodoEdicion",
-        html: `<div class="nodo-edicion"></div>`,
-        iconSize: [18, 18],
-        iconAnchor: [9, 9]
+        html: `<div style="
+  width:18px;
+  height:18px;
+  background:#00ff88;
+  border:3px solid white;
+  border-radius:50%;
+  box-shadow:0 0 10px rgba(0,0,0,.8);
+"></div>`,
       })
     }).addTo(estado.map);
 
