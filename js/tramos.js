@@ -176,28 +176,19 @@ function activarEdicionRuta(tramo) {
   limpiarNodosEdicion();
 
   tramo.puntos.forEach((punto, index) => {
-    const nodo = L.circleMarker(punto, {
-      radius: 7,
-      color: "#ffffff",
-      fillColor: "#00ff88",
-      fillOpacity: 1,
-      weight: 2,
-      draggable: true
+    const nodo = L.marker(punto, {
+      draggable: true,
+      icon: L.divIcon({
+        className: "nodoEdicion",
+        html: `<div class="nodo-edicion"></div>`,
+        iconSize: [18, 18],
+        iconAnchor: [9, 9]
+      })
     }).addTo(estado.map);
 
-    nodo.on("mousedown", () => {
-      estado.map.dragging.disable();
-    });
-
-    nodo.on("mouseup", () => {
-      estado.map.dragging.enable();
-    });
-
-    nodo.on("mousemove", e => {
-      if (!e.originalEvent.buttons) return;
-
-      const nuevoPunto = [e.latlng.lat, e.latlng.lng];
-      tramo.puntos[index] = nuevoPunto;
+    nodo.on("drag", e => {
+      const latlng = e.target.getLatLng();
+      tramo.puntos[index] = [latlng.lat, latlng.lng];
 
       redibujarTodo();
       activarEdicionRuta(tramo);
