@@ -13,5 +13,6 @@ const estado = {
   puntosTemp: [],
   lineaTemp: null,
   tramoSeleccionadoId: null,
-  puntosVisuales: []
+  puntosVisuales: [],
+  marcadoresEdicion: []
 };
