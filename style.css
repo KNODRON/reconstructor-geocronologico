@@ -138,3 +138,12 @@ button {
   width: 100%;
   margin-top: 6px;
 }
+
+.nodo-edicion {
+  width: 14px;
+  height: 14px;
+  background: #00ff88;
+  border: 2px solid white;
+  border-radius: 50%;
+  box-shadow: 0 0 8px rgba(0,0,0,.6);
+}
