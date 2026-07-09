@@ -86,7 +86,7 @@ function reproducirFrameTramo(tramo, tiempoVideo) {
     }).addTo(estado.map);
 
     tramo._marcadorAnimado = L.marker(tramo.puntos[0], {
-      icon: crearIconoMovil(tramo.movilidad, 0)
+      icon: crearIconoMovil(tramo.movilidad, 0, tramo.sujetos.join(", "))
     }).addTo(estado.map);
 
     mostrarPopupTramo(tramo);
@@ -109,7 +109,9 @@ function reproducirFrameTramo(tramo, tiempoVideo) {
   if (indice > 0) {
     const puntoAnterior = tramo._puntosAnimados[indice - 1];
     const angulo = calcularAngulo(puntoAnterior, puntoActual);
-    tramo._marcadorAnimado.setIcon(crearIconoMovil(tramo.movilidad, angulo));
+    tramo._marcadorAnimado.setIcon(
+  crearIconoMovil(tramo.movilidad, angulo, tramo.sujetos.join(", "))
+);
   }
 
   if (progreso >= 1) {
@@ -159,27 +161,52 @@ function interpolarRuta(puntos, pasosPorTramo = 35) {
   return resultado;
 }
 
-function crearIconoMovil(movilidad, angulo) {
+function crearIconoMovil(movilidad, angulo, texto = "") {
   const icono = ICONOS_MOVILIDAD[movilidad] || "📍";
 
   return L.divIcon({
     className: "iconoMovil",
     html: `
       <div style="
-        transform: rotate(${angulo}deg);
-        font-size: 36px;
-        width: 40px;
-        height: 40px;
         display:flex;
+        flex-direction:column;
         align-items:center;
         justify-content:center;
-      ">${icono}</div>
+        transform: rotate(${angulo}deg);
+      ">
+        <div style="
+          font-size:36px;
+          width:40px;
+          height:40px;
+          display:flex;
+          align-items:center;
+          justify-content:center;
+        ">
+          ${icono}
+        </div>
+      </div>
+
+      <div style="
+        position:absolute;
+        top:34px;
+        left:50%;
+        transform:translateX(-50%);
+        background:rgba(0,0,0,.72);
+        color:white;
+        padding:3px 8px;
+        border-radius:8px;
+        font-size:11px;
+        white-space:nowrap;
+        box-shadow:0 2px 8px rgba(0,0,0,.45);
+        border:1px solid rgba(255,255,255,.25);
+      ">
+        ${texto}
+      </div>
     `,
-    iconSize: [40, 40],
-    iconAnchor: [20, 20]
+    iconSize: [80, 60],
+    iconAnchor: [40, 30]
   });
 }
-
 function calcularAngulo(p1, p2) {
   const dy = p2[0] - p1[0];
   const dx = p2[1] - p1[1];
