@@ -104,9 +104,9 @@ function dibujarEvento(evento) {
   const marcador = L.marker([evento.lat, evento.lng], {
     icon: L.divIcon({
       className: "iconoEvento",
-      html: iconoEvento(evento.categoria),
-      iconSize: [34, 34],
-      iconAnchor: [17, 34]
+      html: crearHtmlEvento(evento),
+      iconSize: [90, 90],
+      iconAnchor: [45, 45]
     })
   }).addTo(estado.map);
 
@@ -114,6 +114,26 @@ function dibujarEvento(evento) {
   evento.capa = marcador;
 }
 
+function crearHtmlEvento(evento) {
+  const categoria = (evento.categoria || "").toLowerCase();
+
+  if (
+    categoria.includes("ae") ||
+    categoria.includes("artefacto") ||
+    categoria.includes("instalacion") ||
+    categoria.includes("instalación") ||
+    categoria.includes("sitio") ||
+    categoria.includes("quema")
+  ) {
+    return `
+      <div class="evento-onda">
+        <div class="evento-centro"></div>
+      </div>
+    `;
+  }
+
+  return `<div style="font-size:30px;">${iconoEvento(evento.categoria)}</div>`;
+}
 function iconoEvento(categoria = "") {
   const cat = categoria.toLowerCase();
 
