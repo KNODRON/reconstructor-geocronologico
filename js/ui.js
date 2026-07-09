@@ -157,6 +157,7 @@ function seleccionarTramo(id) {
   });
 
   centrarEnPuntos(tramo.puntos, [60, 60]);
+  activarEdicionRuta(tramo);
 }
 
 function guardarCambiosTramo() {
@@ -175,6 +176,7 @@ function guardarCambiosTramo() {
 
   redibujarTodo();
   actualizarGuion();
+  limpiarNodosEdicion();
 }
 
 function eliminarTramoPorId(id) {
