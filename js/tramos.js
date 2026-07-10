@@ -147,9 +147,7 @@ function crearHtmlEvento(evento) {
     </div>
   `;
 }
-
-  return `<div style="font-size:30px;">${iconoEvento(evento.categoria)}</div>`;
-}
+  
 function iconoEvento(categoria = "") {
   const cat = categoria.toLowerCase();
 
