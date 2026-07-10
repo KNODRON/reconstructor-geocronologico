@@ -103,36 +103,50 @@ function dibujarTramoFinal(tramo) {
 }
 
 function dibujarEvento(evento) {
+  const esEventoCritico = eventoTieneOnda(evento);
+
   const marcador = L.marker([evento.lat, evento.lng], {
+    interactive: true,
+    zIndexOffset: 1000,
+
     icon: L.divIcon({
-      className: "iconoEvento",
+      className: "marcador-evento-leaflet",
       html: crearHtmlEvento(evento),
-      iconSize: [90, 90],
-      iconAnchor: [45, 45]
+
+      // La caja y el anclaje deben coincidir exactamente.
+      iconSize: esEventoCritico ? [100, 100] : [40, 40],
+      iconAnchor: esEventoCritico ? [50, 50] : [20, 20],
+
+      tooltipAnchor: esEventoCritico ? [0, -52] : [0, -22]
     })
   }).addTo(estado.map);
 
-  marcador.bindTooltip(evento.titulo, { permanent: false });
+  marcador.bindTooltip(evento.titulo, {
+    permanent: false,
+    direction: "top"
+  });
+
   evento.capa = marcador;
 }
 
 function crearHtmlEvento(evento) {
-  const categoria = (evento.categoria || "").toLowerCase();
-
-  if (
-    categoria.includes("ae") ||
-    categoria.includes("artefacto") ||
-    categoria.includes("instalacion") ||
-    categoria.includes("instalación") ||
-    categoria.includes("sitio") ||
-    categoria.includes("quema")
-  ) {
+  if (eventoTieneOnda(evento)) {
     return `
-      <div class="evento-onda">
+      <div class="evento-onda-contenedor">
+        <div class="evento-onda evento-onda-1"></div>
+        <div class="evento-onda evento-onda-2"></div>
+        <div class="evento-onda evento-onda-3"></div>
         <div class="evento-centro"></div>
       </div>
     `;
   }
+
+  return `
+    <div class="evento-icono-normal">
+      ${iconoEvento(evento.categoria)}
+    </div>
+  `;
+}
 
   return `<div style="font-size:30px;">${iconoEvento(evento.categoria)}</div>`;
 }
@@ -203,4 +217,17 @@ function activarEdicionRuta(tramo) {
 
     estado.marcadoresEdicion.push(nodo);
   });
+}
+
+function eventoTieneOnda(evento) {
+  const categoria = (evento.categoria || "").toLowerCase();
+
+  return (
+    categoria.includes("ae") ||
+    categoria.includes("artefacto") ||
+    categoria.includes("instalacion") ||
+    categoria.includes("instalación") ||
+    categoria.includes("sitio") ||
+    categoria.includes("quema")
+  );
 }
