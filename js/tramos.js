@@ -97,6 +97,8 @@ function dibujarTramoFinal(tramo) {
     dashArray: tramo.movilidad === "caminando" ? "10,10" : null
   }).addTo(estado.map);
 
+  // Referencia directa para editar sin redibujar todo
+  tramo.lineaCapa = linea;
   tramo.capas.push(linea);
 }
 
