@@ -2,13 +2,24 @@ async function reproducirProyecto() {
   limpiarTramosDelMapa();
 
   const items = [
-    ...proyecto.tramos.map(t => ({ ...t, _tipoRender: "tramo", _orden: t.horaInicio })),
-    ...proyecto.eventos.map(e => ({ ...e, _tipoRender: "evento", _orden: e.hora }))
-  ].sort((a, b) => a._orden.localeCompare(b._orden));
+  ...proyecto.tramos.map(t => ({
+    ...t,
+    _tipoRender: "tramo",
+    _orden: t.horaInicio
+  })),
 
-  if (items.length === 0) return;
+  ...proyecto.eventos.map(e => ({
+    ...e,
+    _tipoRender: "evento",
+    _orden: e.hora
+  })),
 
-  reproducirLineaTiempo(items);
+  ...(proyecto.letreros || []).map(l => ({
+    ...l,
+    _tipoRender: "letrero",
+    _orden: l.hora
+  }))
+].sort((a, b) => a._orden.localeCompare(b._orden));
 }
 
 function reproducirLineaTiempo(items) {
@@ -30,6 +41,10 @@ function reproducirLineaTiempo(items) {
     if (item._tipoRender === "evento") {
       item._duracionVisual = Number(item.duracionVideo) || 5;
     }
+    if (item._tipoRender === "letrero") {
+      item._duracionVisual = Number(item.duracionVideo) || 5;
+    }
+    
   });
 
   const duracionTotal = Math.max(
@@ -60,6 +75,10 @@ function reproducirLineaTiempo(items) {
 
       if (item._tipoRender === "evento") {
         reproducirFrameEvento(item, tiempoVideo);
+      }
+
+      if (item._tipoRender === "letrero") {
+        reproducirFrameLetrero(item, tiempoVideo);
       }
     });
 
@@ -244,4 +263,58 @@ function limpiarTramosDelMapa() {
 
     });
 
+}
+
+function reproducirFrameLetrero(letrero, tiempoVideo) {
+  if (!letrero._iniciado) {
+    letrero._iniciado = true;
+    mostrarLetrero(letrero);
+  }
+
+  const progreso = Math.min(
+    (tiempoVideo - letrero._inicioVisual) /
+      letrero._duracionVisual,
+    1
+  );
+
+  if (progreso >= 1) {
+    letrero._finalizado = true;
+    ocultarLetrero();
+  }
+}
+
+function mostrarLetrero(letrero) {
+  const popup = document.getElementById("popupEvento");
+
+  document.getElementById("popupTitulo").textContent =
+    letrero.titulo;
+
+  document.getElementById("popupDescripcion").textContent =
+    letrero.descripcion;
+
+  document.getElementById("popupHora").textContent =
+    `${letrero.hora} ${letrero.referenciaHoraria}` +
+    (
+      letrero.sujetos.length
+        ? ` | ${letrero.sujetos.join(", ")}`
+        : ""
+    );
+
+  popup.classList.add("popup-letrero");
+  popup.classList.remove("oculto");
+
+  requestAnimationFrame(() => {
+    popup.classList.add("popup-visible");
+  });
+}
+
+function ocultarLetrero() {
+  const popup = document.getElementById("popupEvento");
+
+  popup.classList.remove("popup-visible");
+
+  setTimeout(() => {
+    popup.classList.add("oculto");
+    popup.classList.remove("popup-letrero");
+  }, 450);
 }
