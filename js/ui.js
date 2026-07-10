@@ -4,12 +4,13 @@ function inicializarUI() {
   document.getElementById("btnDeshacerPunto").addEventListener("click", deshacerPunto);
   document.getElementById("btnPlay").addEventListener("click", reproducirProyecto);
   document.getElementById("btnGuardar").addEventListener("click", guardarProyecto);
+  document.getElementById("toolLetrero").addEventListener("click", crearLetrero);
 
   document.getElementById("toolEvento").addEventListener("click", activarModoEvento);
 
   document.getElementById("btnNuevo").addEventListener("click", nuevoProyecto);
   document.getElementById("btnAbrir").addEventListener("click", () => {
-    document.getElementById("inputAbrirProyecto").click();
+  document.getElementById("inputAbrirProyecto").click();  
   });
   document.getElementById("inputAbrirProyecto").addEventListener("change", abrirProyecto);
 }
@@ -47,7 +48,8 @@ function actualizarGuion() {
 
   const items = [
     ...proyecto.tramos.map(t => ({ ...t, _orden: t.horaInicio })),
-    ...proyecto.eventos.map(e => ({ ...e, _orden: e.hora }))
+    ...proyecto.eventos.map(e => ({ ...e, _orden: e.hora })),
+    ...(proyecto.letreros || []).map(l => ({ ...l, _orden: l.hora }))
   ].sort((a, b) => a._orden.localeCompare(b._orden));
 
   items.forEach(item => {
@@ -81,6 +83,21 @@ function actualizarGuion() {
       });
     }
 
+    if (item.tipo === "letrero") {
+      card.innerHTML = `
+        <strong>${item.hora} ${item.referenciaHoraria}</strong><br>
+        <span>📋 ${item.titulo}</span><br>
+        <small>${item.sujetos.join(", ")}</small><br>
+        <small>Tiempo en pantalla: ${item.duracionVideo}s</small>
+
+        <div class="accionesCard">
+          <button onclick="eliminarLetreroPorId('${item.id}')">
+            Eliminar
+          </button>
+        </div>
+      `;
+    }
+    
     contenedor.appendChild(card);
   });
 }
@@ -199,6 +216,7 @@ function nuevoProyecto() {
   proyecto.sujetos = [];
   proyecto.tramos = [];
   proyecto.eventos = [];
+  proyecto.letreros = [];
   estado.tramoSeleccionadoId = null;
 
   redibujarTodo();
@@ -250,4 +268,52 @@ function segundosAHora(total) {
   const s = String(total % 60).padStart(2, "0");
 
   return `${h}:${m}:${s}`;
+}
+
+function crearLetrero() {
+  const titulo = prompt(
+    "Título del letrero:",
+    "Información relevante"
+  );
+
+  if (!titulo) return;
+
+  const descripcion = prompt(
+    "Descripción:",
+    "Antecedente relevante dentro de la reconstrucción geocronológica."
+  ) || "";
+
+  const hora = prompt(
+    "Hora de aparición:",
+    document.getElementById("horaInicio").value
+  ) || "00:00:00";
+
+  const duracionVideo = Number(
+    prompt("Tiempo en pantalla, en segundos:", "5")
+  ) || 5;
+
+  const letrero = {
+    id: crypto.randomUUID(),
+    tipo: "letrero",
+    hora,
+    referenciaHoraria:
+      document.getElementById("referenciaHoraria").value,
+    sujetos: obtenerSujetosSeleccionados(),
+    titulo,
+    descripcion,
+    duracionVideo
+  };
+
+  proyecto.letreros.push(letrero);
+  actualizarGuion();
+}
+
+function eliminarLetreroPorId(id) {
+  if (!confirm("¿Eliminar este letrero?")) return;
+
+  proyecto.letreros = proyecto.letreros.filter(
+    letrero => letrero.id !== id
+  );
+
+  actualizarGuion();
 }
