@@ -3,7 +3,8 @@ const proyecto = {
   referenciaHoraria: CONFIG.referenciaDefault,
   sujetos: [],
   tramos: [],
-  eventos: []
+  eventos: [],
+  letreros: []
 };
 
 const estado = {
