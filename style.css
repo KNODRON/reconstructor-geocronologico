@@ -147,3 +147,25 @@ button {
   border-radius: 50%;
   box-shadow: 0 0 8px rgba(0,0,0,.6);
 }
+
+.nodo-ruta-principal {
+  width: 18px;
+  height: 18px;
+  background: #00e58a;
+  border: 3px solid #ffffff;
+  border-radius: 50%;
+  box-shadow:
+    0 0 0 2px rgba(0, 0, 0, 0.45),
+    0 3px 10px rgba(0, 0, 0, 0.65);
+  cursor: move;
+}
+
+.nodo-ruta-intermedio {
+  width: 12px;
+  height: 12px;
+  background: #ffcc00;
+  border: 2px solid #ffffff;
+  border-radius: 50%;
+  box-shadow: 0 2px 7px rgba(0, 0, 0, 0.65);
+  cursor: move;
+}
