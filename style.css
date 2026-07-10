@@ -169,3 +169,48 @@ button {
   box-shadow: 0 2px 7px rgba(0, 0, 0, 0.65);
   cursor: move;
 }
+
+#popupEvento {
+  opacity: 0;
+  transform: translateY(20px) scale(.98);
+  transition:
+    opacity .45s ease,
+    transform .45s ease;
+}
+
+#popupEvento.popup-visible {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+#popupEvento.popup-letrero {
+  min-width: 380px;
+  max-width: 520px;
+
+  background: rgba(255,255,255,.96);
+
+  border-left: 8px solid #007639;
+
+  box-shadow:
+    0 18px 45px rgba(0,0,0,.38),
+    0 3px 10px rgba(0,0,0,.2);
+}
+
+#popupEvento.popup-letrero h2 {
+  margin-bottom: 8px;
+  font-size: 22px;
+  color: #15191d;
+}
+
+#popupEvento.popup-letrero p {
+  margin-bottom: 10px;
+  font-size: 15px;
+  line-height: 1.45;
+  color: #34383d;
+}
+
+#popupEvento.popup-letrero span {
+  font-size: 13px;
+  font-weight: 600;
+  color: #007639;
+}
