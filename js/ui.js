@@ -161,6 +161,7 @@ function seleccionarTramo(id) {
   setTimeout(() => {
     activarEditorRuta(tramo);
   }, 500);
+}
 
 function guardarCambiosTramo() {
   const tramo = proyecto.tramos.find(t => t.id === estado.tramoSeleccionadoId);
