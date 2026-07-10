@@ -157,10 +157,7 @@ function seleccionarTramo(id) {
   });
 
   centrarEnPuntos(tramo.puntos, [60, 60]);
-
-  setTimeout(() => {
-    activarEditorRuta(tramo);
-  }, 500);
+  
 }
 
 function guardarCambiosTramo() {
