@@ -159,9 +159,8 @@ function seleccionarTramo(id) {
   centrarEnPuntos(tramo.puntos, [60, 60]);
 
   setTimeout(() => {
-    activarEdicionRuta(tramo);
-  }, 400);
-}
+    activarEditorRuta(tramo);
+  }, 500);
 
 function guardarCambiosTramo() {
   const tramo = proyecto.tramos.find(t => t.id === estado.tramoSeleccionadoId);
@@ -177,9 +176,11 @@ function guardarCambiosTramo() {
   tramo.titulo = document.getElementById("tituloTramo").value;
   tramo.descripcion = document.getElementById("descripcionTramo").value;
 
+  desactivarEditorRuta();
   redibujarTodo();
   actualizarGuion();
-  limpiarNodosEdicion();
+
+  alert("Guardadito");
 }
 
 function eliminarTramoPorId(id) {
